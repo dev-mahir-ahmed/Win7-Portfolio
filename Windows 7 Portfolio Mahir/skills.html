@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Skills Matrix</title>
+    <link rel="stylesheet" href="css/apps.css">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #fff; 
+            color: #333; 
+            margin: 0; 
+            padding: 25px; 
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #005a9e 0%, #003366 100%);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        h1 { font-size: 24px; color: #003399; margin: 0; }
+
+        .subtitle { font-size: 13px; color: #666; margin-top: 2px; }
+
+        h2 {
+            font-size: 15px;
+            color: #444;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eee;
+            margin-left: 15px;
+        }
+
+        .skill-group { margin-bottom: 30px; }
+
+        .skill-item { display: flex; align-items: center; margin-bottom: 12px; }
+
+        .skill-name { width: 160px; font-weight: 600; font-size: 13px; }
+
+        .skill-percent { width: 40px; font-size: 12px; font-weight: bold; text-align: right; }
+
+        .skill-bar-container {
+            flex: 1;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .skill-bar {
+            height: 100%;
+            width: 0;
+            transition: width 1.5s ease;
+        }
+
+        .color-html { background: linear-gradient(90deg, #e34f26, #ff6b43); }
+        .color-css { background: linear-gradient(90deg, #264de4, #4c7bd9); }
+        .color-js { background: linear-gradient(90deg, #f7df1e, #ffe95a); }
+        .color-react { background: linear-gradient(90deg, #61dafb, #21a1f1); }
+        .color-tailwind { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+
+        .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .badge {
+            background: #fff;
+            border: 1px solid #c4ccda;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #003399;
+            transition: 0.2s;
+        }
+
+        .badge:hover {
+            background: #f0f4f9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-icon">💻</div>
+    <div>
+        <h1>Technical Skills of Mahir Ahmed</h1>
+        <div class="subtitle">A Passionate Frontend Developer</div>
+    </div>
+</div>
+
+<div class="skill-group">
+    <h2>Core Frontend</h2>
+
+    <div class="skill-item">
+        <div class="skill-name">HTML5</div>
+        <div class="skill-bar-container"><div class="skill-bar color-html" data-width="98%"></div></div>
+        <div class="skill-percent">98%</div>
+    </div>
+
+    <div class="skill-item">
+        <div class="skill-name">CSS3</div>
+        <div class="skill-bar-container"><div class="skill-bar color-css" data-width="95%"></div></div>
+        <div class="skill-percent">95%</div>
+    </div>
+
+    <div class="skill-item">
+        <div class="skill-name">JavaScript</div>
+        <div class="skill-bar-container"><div class="skill-bar color-js" data-width="90%"></div></div>
+        <div class="skill-percent">90%</div>
+    </div>
+</div>
+
+<div class="skill-group">
+    <h2>Frameworks</h2>
+
+    <div class="skill-item">
+        <div class="skill-name">React</div>
+        <div class="skill-bar-container"><div class="skill-bar color-react" data-width="85%"></div></div>
+        <div class="skill-percent">85%</div>
+    </div>
+
+    <div class="skill-item">
+        <div class="skill-name">Tailwind CSS</div>
+        <div class="skill-bar-container"><div class="skill-bar color-tailwind" data-width="88%"></div></div>
+        <div class="skill-percent">88%</div>
+    </div>
+</div>
+
+<div class="skill-group">
+    <h2>Backend & Services</h2>
+    <div class="badges">
+        <div class="badge">Firebase</div>
+        <div class="badge">REST API</div>
+        <div class="badge">API Integration</div>
+    </div>
+</div>
+
+<div class="skill-group">
+    <h2>Tools</h2>
+    <div class="badges">
+        <div class="badge">Git</div>
+        <div class="badge">GitHub</div>
+        <div class="badge">Figma</div>
+    </div>
+</div>
+
+<div class="skill-group">
+    <h2>Other Skills</h2>
+    <div class="badges">
+        <div class="badge">Responsive Design</div>
+        <div class="badge">UI/UX</div>
+        <div class="badge">SEO</div>
+        <div class="badge">Web Performance</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        document.querySelectorAll('.skill-bar').forEach(bar => {
+            bar.style.width = bar.getAttribute('data-width');
+        });
+    }, 100);
+});
+</script>
+
+</body>
+</html>

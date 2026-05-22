@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Terminal</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 10px;
+            margin: 0;
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        #output {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+        }
+        #prompt-line {
+            display: flex;
+        }
+        #prompt {
+            color: #0f0;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        #input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            outline: none;
+            font-family: inherit;
+            flex: 1;
+            font-size: 16px;
+        }
+        .help-text { color: #aaa; }
+    </style>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/db1tiugho/image/upload/c_fill,ar_1:1,g_auto,r_max,w_64,h_64,f_png/v1772822338/147969248_ycsb1h.jpg"/>
+</head>
+<body>
+    <div id="output">Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+<span class="help-text">Type 'help' for a list of available commands.</span>
+</div>
+    <div id="prompt-line">
+        <span id="prompt">C:\\Users\\Mahir Ahmed&gt;</span>
+        <input type="text" id="input" autofocus autocomplete="off" spellcheck="false">
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        
+        document.addEventListener('click', () => input.focus());
+
+        const commands = {
+            'help': `Available commands:
+  help      - Show this message
+  whoami    - Display user info
+  projects  - Open projects
+  resume    - Open resume
+  skills    - Open skills
+  computer  - Open My Computer
+  calculator - Open calculator
+  notepad   - Open notepad
+  recycle   - Open Recycle Bin
+  github    - Open github
+  contact   - Open contact
+  sudo hire rishav - ???
+  sudo rm -rf system32 - Delete System
+  clear     - Clear terminal`,
+            'whoami': `Mahir Ahmed\nDeveloper / Automation Builder\nHR Tech Tools Creator\nOpen Source Hacker`,
+            'projects': 'Opening projects...',
+            'resume': 'Opening resume...',
+            'skills': 'Opening skills...',
+            'computer': 'Opening My Computer...',
+            'calculator': 'Opening calculator...',
+            'notepad': 'Opening notepad...',
+            'recycle': 'Opening Recycle Bin...',
+            'github': 'Opening github...',
+            'contact': 'Opening contact...',
+            'sudo rm -rf system32': 'Access denied.\nNice try.',
+            'clear': ''
+        };
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value.trim().toLowerCase();
+                const outCmd = this.value;
+                this.value = '';
+
+                // Echo prompt and command
+                const log = document.createElement('div');
+                log.innerHTML = `<span style="color:#0f0;">C:\\Users\\Mahir Ahmed&gt;</span> ${outCmd}`;
+                output.appendChild(log);
+
+                if (cmd === '') return;
+
+                if (cmd === 'clear') {
+                    output.innerHTML = '';
+                    window.scrollTo(0, document.body.scrollHeight);
+                    return;
+                }
+
+                const res = document.createElement('div');
+                res.style.marginBottom = '10px';
+
+                // Hidden Easter Egg
+                if (cmd === 'sudo hire rishav') {
+                    res.innerHTML = '<span style="color: #0f0;">Permission granted.</span><br>Opening resume...';
+                    output.appendChild(res);
+                    window.scrollTo(0, document.body.scrollHeight);
+                    
+                    setTimeout(() => {
+                        if (window.parent) {
+                            window.parent.postMessage({ type: 'openApp', appId: 'resume' }, '*');
+                        }
+                    }, 800);
+                    return;
+                }
+
+                if (commands.hasOwnProperty(cmd)) {
+                    // Fix regex to actually target newlines
+                    res.innerHTML = commands[cmd].replace(/\n/g, '<br>');
+                    
+                    // Call parent window to open app using postMessage to bypass sandboxing
+                    if (['projects', 'resume', 'skills', 'computer', 'calculator', 'notepad', 'recycle', 'github', 'contact'].includes(cmd)) {
+                        setTimeout(() => {
+                            window.parent.postMessage({ type: 'openApp', appId: cmd }, '*');
+                        }, 500);
+                    }
+                } else {
+                    res.innerHTML = `'${cmd}' is not recognized as an internal or external command,<br>operable program or batch file.`;
+                }
+
+                output.appendChild(res);
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Mahir_OS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+            color: #333;
+        }
+
+        .about-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f4f7f9 100%);
+            padding: 25px 35px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #e1e9f0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .about-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 120, 215, 0.2), transparent);
+        }
+
+        .os-logo {
+            width: 70px;
+            height: 70px;
+            margin-right: 30px;
+            position: relative;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .os-logo-sq {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .os-logo:hover .os-logo-sq {
+            transform: scale(1.05);
+        }
+        
+        .os-logo-sq.red { background: linear-gradient(135deg, #f25022, #c53812); top: 0; left: 0; }
+        .os-logo-sq.green { background: linear-gradient(135deg, #7fba00, #5a8500); top: 0; right: 0; }
+        .os-logo-sq.blue { background: linear-gradient(135deg, #00a4ef, #0076ad); bottom: 0; left: 0; }
+        .os-logo-sq.yellow { background: linear-gradient(135deg, #ffb900, #cc9400); bottom: 0; right: 0; }
+
+        .os-title h1 {
+            margin: 0;
+            font-size: 32px;
+            color: #004d99;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .os-title h2 {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .about-content {
+            flex-grow: 1;
+            padding: 25px 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .sys-info-box {
+            background: #ffffff;
+            border: 1px solid #d4dbe0;
+            border-radius: 8px;
+            padding: 20px 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            width: 140px;
+            color: #555;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            flex-grow: 1;
+            color: #111;
+        }
+        
+        .info-value.funny {
+            color: #c9302c;
+            font-weight: 500;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: #888;
+            margin-top: auto;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dcdcdc, transparent);
+            margin: 18px 0;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        button.ok-btn {
+            padding: 6px 35px;
+            background: linear-gradient(to bottom, #f0f0f0, #e1e1e1);
+            border: 1px solid #999;
+            border-radius: 3px;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.1);
+            color: #000;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        button.ok-btn:hover {
+            background: linear-gradient(to bottom, #eaf2fa, #d0e4f5);
+            border-color: #3399ff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 0 3px rgba(51, 153, 255, 0.5);
+        }
+        
+        button.ok-btn:active {
+            background: linear-gradient(to bottom, #cde0f1, #eaf2fa);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+            border-color: #0b7bcb;
+        }
+
+        /* Scrollbar styles for inner content */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #a8a8a8; }
+
+    </style>
+</head>
+<body>
+
+    <div class="about-header">
+        <div class="os-logo">
+            <div class="os-logo-sq red"></div>
+            <div class="os-logo-sq green"></div>
+            <div class="os-logo-sq blue"></div>
+            <div class="os-logo-sq yellow"></div>
+        </div>
+        <div class="os-title">
+            <h1>Mahir_OS</h1>
+            <h2>Version 1.0 (Build 9001 - "It's Over 9000!")</h2>
+        </div>
+    </div>
+
+    <div class="about-content">
+        <p style="margin:0; font-size:13px; color:#555; text-align: center; font-style: italic;">Microsoft isn't real. Only the web exists.</p>
+        
+        <div class="sys-info-box">
+            <div class="info-row">
+                <div class="info-label">System Type:</div>
+                <div class="info-value">128-bit Extremely Operating System</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Kernel:</div>
+                <div class="info-value">Chromium V8 Engine (Powered by Anxiety)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Installed RAM:</div>
+                <div class="info-value funny">Unlimited</div>
+            </div>
+            
+            <div class="separator"></div>
+
+            <div class="info-row">
+                <div class="info-label">System Uptime:</div>
+                <div class="info-value" id="live-uptime" style="font-family: monospace; font-size: 14px;">Loading...</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">GitHub Projects:</div>
+                <div class="info-value funny">101 (And counting...)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Coffee Consumed:</div>
+                <div class="info-value funny">NaN (Stack Overflow Error)</div>
+            </div>
+        </div>
+        
+        <div class="footer-text">
+            &copy; 2026 Mahir Ahmed. All rights reserved.<br>
+            Warning: This computer program is protected by absolutely nothing.
+        </div>
+        
+        <div class="btn-container">
+            <button class="ok-btn" onclick="window.parent.postMessage({ type: 'closeWindow', winId: '*' }, '*')">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Fake Uptime Counter that ticks up forever
+        let sysUptimeSecs = 1295; // 00:21:35
+        
+        function updateUptime() {
+            sysUptimeSecs++;
+            let h = Math.floor(sysUptimeSecs / 3600);
+            let m = Math.floor((sysUptimeSecs % 3600) / 60);
+            let s = sysUptimeSecs % 60;
+            
+            document.getElementById('live-uptime').innerText = 
+                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        
+        setInterval(updateUptime, 1000);
+        updateUptime();
+
+        // Hack for OK button: we don't know exactly what our winId is inside an iframe,
+        // but we can ask the parent to just close us using our appId identifier instead.
+        document.querySelector('.ok-btn').addEventListener('click', () => {
+             // In window.js, we need to handle wildcard or appId closes, or we just rely on the close button top right.
+             // We'll shoot a custom message
+             if (window.parent) {
+                 window.parent.postMessage({ type: 'closeApp', appId: 'about' }, '*');
+             }
+        });
+
+        // ── Source Code Inspect Block js code ────────
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+            document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.key == 'u') || (e.ctrlKey && e.shiftKey && e.key == 'I')) {
+                return false;
+              }
+            }
+            
+    </script>
+</body>
+</html>

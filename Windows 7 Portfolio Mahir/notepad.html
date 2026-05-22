@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notepad</title>
+    <link rel="stylesheet" href="css/apps.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            background: #fff;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #111;
+        }
+
+        .notepad-shell {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #c8ced9;
+            background: #fff;
+        }
+
+        .doc-strip {
+            height: 27px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #2c4a68;
+            background: linear-gradient(to bottom, #f4f7fb 0%, #e9eff8 100%);
+            border-bottom: 1px solid #d0d7e2;
+        }
+
+        .menu-bar {
+            height: 29px;
+            display: flex;
+            align-items: stretch;
+            padding-left: 3px;
+            border-bottom: 1px solid #d7dbe4;
+            background: #f9fbfd;
+            position: relative;
+            z-index: 40;
+        }
+
+        .menu-root {
+            position: relative;
+        }
+
+        .menu-trigger {
+            height: 100%;
+            padding: 0 10px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            color: #111;
+            cursor: default;
+        }
+
+        .menu-root.open .menu-trigger {
+            background: #dbe8f8;
+            border-left: 1px solid #9db8d8;
+            border-right: 1px solid #9db8d8;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 245px;
+            border: 1px solid #97adc8;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: #fff;
+            padding: 4px;
+        }
+
+        .menu-root.open .menu-dropdown {
+            display: block;
+        }
+
+        .menu-item {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #111;
+            text-align: left;
+            font-size: 12px;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: default;
+            white-space: nowrap;
+        }
+
+        .menu-item:hover:not(.disabled) {
+            background: #dbeefe;
+            border-color: #8fbde8;
+        }
+
+        .menu-item.disabled {
+            color: #9a9a9a;
+        }
+
+        .menu-item .left {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .menu-item .shortcut {
+            color: #666;
+            margin-left: 22px;
+            font-size: 11px;
+        }
+
+        .checkmark {
+            width: 12px;
+            visibility: hidden;
+            color: #235887;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .menu-item.checked .checkmark {
+            visibility: visible;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #d6d6d6;
+            margin: 4px 2px;
+        }
+
+        .editor-wrap {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: Consolas, "Lucida Console", monospace;
+            font-size: 15px;
+            line-height: 1.35;
+            padding: 8px;
+            color: #000;
+            background: #fff;
+            white-space: pre;
+            overflow: auto;
+            tab-size: 4;
+        }
+
+        .status-bar {
+            height: 22px;
+            border-top: 1px solid #d7dbe4;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background: linear-gradient(to bottom, #fbfcfe 0%, #eef2f8 100%);
+            font-size: 11px;
+            color: #384f68;
+        }
+
+        .status-segment {
+            border-left: 1px solid #d7dbe4;
+            padding: 0 10px;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .dialog-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .dialog-box {
+            width: 340px;
+            border: 1px solid #93a9c3;
+            background: #f9fbfe;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .dialog-title {
+            padding: 8px 10px;
+            background: linear-gradient(to bottom, #f4f7fb 0%, #e3ebf7 100%);
+            border-bottom: 1px solid #c6d1df;
+            font-size: 12px;
+            color: #29496a;
+            font-weight: 600;
+        }
+
+        .dialog-content {
+            padding: 12px 12px 8px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .dialog-row {
+            display: grid;
+            grid-template-columns: 85px minmax(0, 1fr);
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .dialog-row input {
+            width: 100%;
+            height: 24px;
+            border: 1px solid #a9b8ca;
+            padding: 0 6px;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+
+        .dialog-actions {
+            padding: 0 12px 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .dialog-btn {
+            min-width: 82px;
+            height: 24px;
+            border: 1px solid #a3b2c4;
+            background: linear-gradient(to bottom, #fff 0%, #e9f0f9 100%);
+            border-radius: 2px;
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .dialog-btn:hover {
+            border-color: #5a9bd6;
+            background: linear-gradient(to bottom, #fff 0%, #dcecff 100%);
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/Mahir.jpg"/>
+</head>
+<body>
+    <div class="notepad-shell">
+        <div class="doc-strip" id="doc-title">Untitled.txt</div>
+
+        <div class="menu-bar" id="menu-bar">
+            <div class="menu-root" data-menu-root="file">
+                <button class="menu-trigger" type="button" data-menu-trigger="file">File</button>
+                <div class="menu-dropdown">
+                    <button class="menu-item" type="button" data-command="new">
+                        <span class="left"><span class="checkmark">&#10003;</span>New</span><span class="shortcut">Ctrl+N</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="open">
+                        <span class="left"><span class="checkmark">&#10003;</span>Open...</span><span class="shortcut">Ctrl+O</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="save">
+                        <span class="left"><span class="checkmark">&#10003;</span>Save</span><span class="shortcut">Ctrl+S</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="save-as">
+                        <span class="left"><span class="checkmark">&#10003;</span>Save As...</span><span class="shortcut">Ctrl+Shift+S</span>
+                    </button>
+                    <div class="menu-divider"></div>
+                    <button class="menu-item" type="button" data-command="exit">
+                        <span class="left"><span class="checkmark">&#10003;</span>Exit</span><span class="shortcut"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu-root" data-menu-root="edit">
+                <button class="menu-trigger" type="button" data-menu-trigger="edit">Edit</button>
+                <div class="menu-dropdown">
+                    <button class="menu-item" type="button" data-command="undo">
+                        <span class="left"><span class="checkmark">&#10003;</span>Undo</span><span class="shortcut">Ctrl+Z</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="redo">
+                        <span class="left"><span class="checkmark">&#10003;</span>Redo</span><span class="shortcut">Ctrl+Y</span>
+                    </button>
+                    <div class="menu-divider"></div>
+                    <button class="menu-item" type="button" data-command="cut">
+                        <span class="left"><span class="checkmark">&#10003;</span>Cut</span><span class="shortcut">Ctrl+X</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="copy">
+                        <span class="left"><span class="checkmark">&#10003;</span>Copy</span><span class="shortcut">Ctrl+C</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="paste">
+                        <span class="left"><span class="checkmark">&#10003;</span>Paste</span><span class="shortcut">Ctrl+V</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="delete-selection">
+                        <span class="left"><span class="checkmark">&#10003;</span>Delete</span><span class="shortcut">Del</span>
+                    </button>
+                    <div class="menu-divider"></div>
+                    <button class="menu-item" type="button" data-command="find">
+                        <span class="left"><span class="checkmark">&#10003;</span>Find...</span><span class="shortcut">Ctrl+F</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="replace">
+                        <span class="left"><span class="checkmark">&#10003;</span>Replace...</span><span class="shortcut">Ctrl+H</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="select-all">
+                        <span class="left"><span class="checkmark">&#10003;</span>Select All</span><span class="shortcut">Ctrl+A</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="time-date">
+                        <span class="left"><span class="checkmark">&#10003;</span>Time/Date</span><span class="shortcut">F5</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu-root" data-menu-root="format">
+                <button class="menu-trigger" type="button" data-menu-trigger="format">Format</button>
+                <div class="menu-dropdown">
+                    <button class="menu-item" type="button" data-command="toggle-word-wrap" id="word-wrap-option">
+                        <span class="left"><span class="checkmark">&#10003;</span>Word Wrap</span><span class="shortcut"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu-root" data-menu-root="view">
+                <button class="menu-trigger" type="button" data-menu-trigger="view">View</button>
+                <div class="menu-dropdown">
+                    <button class="menu-item" type="button" data-command="zoom-in">
+                        <span class="left"><span class="checkmark">&#10003;</span>Zoom In</span><span class="shortcut">Ctrl++</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="zoom-out">
+                        <span class="left"><span class="checkmark">&#10003;</span>Zoom Out</span><span class="shortcut">Ctrl+-</span>
+                    </button>
+                    <button class="menu-item" type="button" data-command="zoom-reset">
+                        <span class="left"><span class="checkmark">&#10003;</span>Restore Default Zoom</span><span class="shortcut">Ctrl+0</span>
+                    </button>
+                    <div class="menu-divider"></div>
+                    <button class="menu-item checked" type="button" data-command="toggle-status-bar" id="status-bar-option">
+                        <span class="left"><span class="checkmark">&#10003;</span>Status Bar</span><span class="shortcut"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu-root" data-menu-root="help">
+                <button class="menu-trigger" type="button" data-menu-trigger="help">Help</button>
+                <div class="menu-dropdown">
+                    <button class="menu-item" type="button" data-command="about">
+                        <span class="left"><span class="checkmark">&#10003;</span>About Notepad</span><span class="shortcut"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="editor-wrap">
+            <textarea id="editor" spellcheck="false"></textarea>
+
+            <div class="dialog-overlay hidden" id="find-dialog">
+                <div class="dialog-box">
+                    <div class="dialog-title">Find</div>
+                    <div class="dialog-content">
+                        <div class="dialog-row">
+                            <label for="find-input">Find what:</label>
+                            <input id="find-input" type="text" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="dialog-btn" type="button" data-dialog-action="find-next">Find Next</button>
+                        <button class="dialog-btn" type="button" data-dialog-action="find-close">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-overlay hidden" id="replace-dialog">
+                <div class="dialog-box">
+                    <div class="dialog-title">Replace</div>
+                    <div class="dialog-content">
+                        <div class="dialog-row">
+                            <label for="replace-find-input">Find what:</label>
+                            <input id="replace-find-input" type="text" autocomplete="off">
+                        </div>
+                        <div class="dialog-row">
+                            <label for="replace-with-input">Replace with:</label>
+                            <input id="replace-with-input" type="text" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="dialog-btn" type="button" data-dialog-action="replace-find-next">Find Next</button>
+                        <button class="dialog-btn" type="button" data-dialog-action="replace-next">Replace</button>
+                        <button class="dialog-btn" type="button" data-dialog-action="replace-all">Replace All</button>
+                        <button class="dialog-btn" type="button" data-dialog-action="replace-close">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-overlay hidden" id="about-dialog">
+                <div class="dialog-box" style="width: 300px;">
+                    <div class="dialog-title">About Notepad</div>
+                    <div class="dialog-content">
+                        <p style="margin: 0 0 8px;">Windows Notepad (Portfolio Edition)</p>
+                        <p style="margin: 0 0 8px;">A plain text editor with classic menus and shortcuts.</p>
+                        <p style="margin: 0;">Version 1.0</p>
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="dialog-btn" type="button" data-dialog-action="about-close">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar" id="status-bar">
+            <div class="status-segment" id="cursor-pos">Ln 1, Col 1</div>
+            <div class="status-segment" id="zoom-level">100%</div>
+            <div class="status-segment">UTF-8</div>
+        </div>
+    </div>
+
+    <input type="file" id="file-picker" class="hidden" accept=".txt,.md,.json,.js,.ts,.css,.html,.xml,.csv,.log,text/*">
+
+    <script>
+        const editor = document.getElementById('editor');
+        const docTitle = document.getElementById('doc-title');
+        const statusBar = document.getElementById('status-bar');
+        const cursorPos = document.getElementById('cursor-pos');
+        const zoomLevel = document.getElementById('zoom-level');
+        const filePicker = document.getElementById('file-picker');
+        const wordWrapOption = document.getElementById('word-wrap-option');
+        const statusBarOption = document.getElementById('status-bar-option');
+        const menuRoots = Array.from(document.querySelectorAll('.menu-root'));
+
+        const findDialog = document.getElementById('find-dialog');
+        const replaceDialog = document.getElementById('replace-dialog');
+        const aboutDialog = document.getElementById('about-dialog');
+        const findInput = document.getElementById('find-input');
+        const replaceFindInput = document.getElementById('replace-find-input');
+        const replaceWithInput = document.getElementById('replace-with-input');
+
+        const state = {
+            fileName: 'Untitled.txt',
+            dirty: false,
+            wordWrap: false,
+            statusBarVisible: true,
+            zoom: 100,
+            lastFindText: ''
+        };
+
+        function updateTitle() {
+            const dirtyMark = state.dirty ? ' *' : '';
+            docTitle.textContent = state.fileName + dirtyMark;
+        }
+
+        function setDirty(nextDirty) {
+            if (state.dirty === nextDirty) return;
+            state.dirty = nextDirty;
+            updateTitle();
+        }
+
+        function getSafeFileName(input) {
+            const trimmed = (input || '').trim();
+            if (!trimmed) return null;
+            return /\.txt$/i.test(trimmed) ? trimmed : `${trimmed}.txt`;
+        }
+
+        function requestDiscardChanges() {
+            if (!state.dirty) return true;
+            return window.confirm('You have unsaved changes. Continue without saving?');
+        }
+
+        function closeMenus() {
+            menuRoots.forEach((root) => root.classList.remove('open'));
+        }
+
+        function openMenu(menuName) {
+            menuRoots.forEach((root) => {
+                const isMatch = root.dataset.menuRoot === menuName;
+                root.classList.toggle('open', isMatch);
+            });
+        }
+
+        function closeDialogs() {
+            findDialog.classList.add('hidden');
+            replaceDialog.classList.add('hidden');
+            aboutDialog.classList.add('hidden');
+        }
+
+        function focusEditor() {
+            editor.focus();
+            updateCursorStatus();
+        }
+
+        function setMenuChecked(el, checked) {
+            el.classList.toggle('checked', checked);
+        }
+
+        function applyWordWrapState() {
+            editor.style.whiteSpace = state.wordWrap ? 'pre-wrap' : 'pre';
+            editor.style.overflowX = state.wordWrap ? 'hidden' : 'auto';
+            setMenuChecked(wordWrapOption, state.wordWrap);
+
+            const statusDisabledByWrap = state.wordWrap;
+            statusBarOption.classList.toggle('disabled', statusDisabledByWrap);
+            if (statusDisabledByWrap) {
+                statusBar.classList.add('hidden');
+            } else {
+                statusBar.classList.toggle('hidden', !state.statusBarVisible);
+            }
+        }
+
+        function applyZoom() {
+            const clamped = Math.max(25, Math.min(500, state.zoom));
+            state.zoom = clamped;
+            editor.style.fontSize = `${(clamped / 100) * 15}px`;
+            zoomLevel.textContent = `${clamped}%`;
+        }
+
+        function updateCursorStatus() {
+            const cursorIndex = editor.selectionStart;
+            const content = editor.value.slice(0, cursorIndex);
+            const lines = content.split('\n');
+            const line = lines.length;
+            const column = lines[lines.length - 1].length + 1;
+            cursorPos.textContent = `Ln ${line}, Col ${column}`;
+        }
+
+        function triggerDownload(fileName, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = fileName;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function saveDocument(forceSaveAs) {
+            let fileName = state.fileName;
+
+            if (forceSaveAs || state.fileName === 'Untitled.txt') {
+                const suggested = window.prompt('Save file as:', state.fileName);
+                if (suggested === null) return false;
+                const resolved = getSafeFileName(suggested);
+                if (!resolved) return false;
+                fileName = resolved;
+            }
+
+            triggerDownload(fileName, editor.value);
+            state.fileName = fileName;
+            setDirty(false);
+            return true;
+        }
+
+        function newDocument() {
+            if (!requestDiscardChanges()) return;
+            editor.value = '';
+            state.fileName = 'Untitled.txt';
+            setDirty(false);
+            updateCursorStatus();
+            focusEditor();
+        }
+
+        function openDocument() {
+            if (!requestDiscardChanges()) return;
+            filePicker.value = '';
+            filePicker.click();
+        }
+
+        function insertAtSelection(text) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            editor.setRangeText(text, start, end, 'end');
+            setDirty(true);
+            updateCursorStatus();
+        }
+
+        function runExec(command) {
+            focusEditor();
+            document.execCommand(command);
+            updateCursorStatus();
+        }
+
+        async function pasteFromClipboard() {
+            focusEditor();
+            const pasted = document.execCommand('paste');
+            if (pasted) return;
+
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    insertAtSelection(text);
+                } catch (err) {
+                    window.alert('Paste is blocked by browser permissions.');
+                }
+            } else {
+                window.alert('Paste is blocked by browser permissions.');
+            }
+        }
+
+        function insertTimeDate() {
+            const stamp = new Date().toLocaleString();
+            insertAtSelection(stamp);
+            focusEditor();
+        }
+
+        function normalizeForFind(value) {
+            return value.toLowerCase();
+        }
+
+        function findNextText(query, fromStart) {
+            const text = editor.value;
+            if (!query) return false;
+
+            const lookupText = normalizeForFind(text);
+            const lookupQuery = normalizeForFind(query);
+            const startIndex = fromStart ? 0 : editor.selectionEnd;
+
+            let matchIndex = lookupText.indexOf(lookupQuery, startIndex);
+            if (matchIndex === -1 && startIndex > 0) {
+                matchIndex = lookupText.indexOf(lookupQuery, 0);
+            }
+
+            if (matchIndex === -1) {
+                window.alert(`Cannot find "${query}".`);
+                return false;
+            }
+
+            editor.focus();
+            editor.setSelectionRange(matchIndex, matchIndex + query.length);
+            updateCursorStatus();
+            return true;
+        }
+
+        function escapeRegExp(value) {
+            return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function replaceCurrentOrNext(findText, replaceText) {
+            if (!findText) return;
+            const selectedText = editor.value.slice(editor.selectionStart, editor.selectionEnd);
+            const isSelectedMatch = normalizeForFind(selectedText) === normalizeForFind(findText);
+
+            if (isSelectedMatch) {
+                insertAtSelection(replaceText);
+                return;
+            }
+
+            if (findNextText(findText, false)) {
+                insertAtSelection(replaceText);
+            }
+        }
+
+        function replaceAll(findText, replaceText) {
+            if (!findText) return;
+            const pattern = new RegExp(escapeRegExp(findText), 'gi');
+            const before = editor.value;
+            const after = before.replace(pattern, replaceText);
+            if (after !== before) {
+                editor.value = after;
+                setDirty(true);
+                updateCursorStatus();
+            }
+        }
+
+        function toggleWordWrap() {
+            state.wordWrap = !state.wordWrap;
+            applyWordWrapState();
+            updateCursorStatus();
+        }
+
+        function toggleStatusBar() {
+            if (state.wordWrap) return;
+            state.statusBarVisible = !state.statusBarVisible;
+            setMenuChecked(statusBarOption, state.statusBarVisible);
+            statusBar.classList.toggle('hidden', !state.statusBarVisible);
+        }
+
+        function closeCurrentWindow() {
+            if (!requestDiscardChanges()) return;
+
+            if (window.parent && window.parent.WindowManager) {
+                const frame = window.frameElement;
+                const win = frame && typeof frame.closest === 'function' ? frame.closest('.window') : null;
+                if (win && win.id) {
+                    window.parent.WindowManager.closeWindow(win.id);
+                }
+            }
+        }
+
+        function executeCommand(command) {
+            switch (command) {
+                case 'new':
+                    newDocument();
+                    break;
+                case 'open':
+                    openDocument();
+                    break;
+                case 'save':
+                    saveDocument(false);
+                    break;
+                case 'save-as':
+                    saveDocument(true);
+                    break;
+                case 'exit':
+                    closeCurrentWindow();
+                    break;
+                case 'undo':
+                    runExec('undo');
+                    break;
+                case 'redo':
+                    runExec('redo');
+                    break;
+                case 'cut':
+                    runExec('cut');
+                    break;
+                case 'copy':
+                    runExec('copy');
+                    break;
+                case 'paste':
+                    pasteFromClipboard();
+                    break;
+                case 'delete-selection':
+                    insertAtSelection('');
+                    break;
+                case 'find':
+                    closeDialogs();
+                    findDialog.classList.remove('hidden');
+                    findInput.value = state.lastFindText;
+                    findInput.focus();
+                    findInput.select();
+                    break;
+                case 'replace':
+                    closeDialogs();
+                    replaceDialog.classList.remove('hidden');
+                    replaceFindInput.value = state.lastFindText;
+                    replaceFindInput.focus();
+                    replaceFindInput.select();
+                    break;
+                case 'select-all':
+                    editor.focus();
+                    editor.select();
+                    updateCursorStatus();
+                    break;
+                case 'time-date':
+                    insertTimeDate();
+                    break;
+                case 'toggle-word-wrap':
+                    toggleWordWrap();
+                    break;
+                case 'zoom-in':
+                    state.zoom += 10;
+                    applyZoom();
+                    break;
+                case 'zoom-out':
+                    state.zoom -= 10;
+                    applyZoom();
+                    break;
+                case 'zoom-reset':
+                    state.zoom = 100;
+                    applyZoom();
+                    break;
+                case 'toggle-status-bar':
+                    toggleStatusBar();
+                    break;
+                case 'about':
+                    closeDialogs();
+                    aboutDialog.classList.remove('hidden');
+                    break;
+                default:
+                    break;
+            }
+
+            closeMenus();
+        }
+
+        document.querySelectorAll('[data-menu-trigger]').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const root = button.closest('.menu-root');
+                const isOpen = root.classList.contains('open');
+                if (isOpen) {
+                    closeMenus();
+                } else {
+                    openMenu(button.dataset.menuTrigger);
+                }
+            });
+        });
+
+        document.querySelectorAll('.menu-item[data-command]').forEach((item) => {
+            item.addEventListener('click', () => {
+                if (item.classList.contains('disabled')) return;
+                executeCommand(item.dataset.command);
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.menu-root')) {
+                closeMenus();
+            }
+        });
+
+        document.querySelectorAll('[data-dialog-action]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.dialogAction;
+
+                if (action === 'find-next') {
+                    state.lastFindText = findInput.value;
+                    findNextText(state.lastFindText, false);
+                } else if (action === 'find-close') {
+                    closeDialogs();
+                    focusEditor();
+                } else if (action === 'replace-find-next') {
+                    state.lastFindText = replaceFindInput.value;
+                    findNextText(state.lastFindText, false);
+                } else if (action === 'replace-next') {
+                    state.lastFindText = replaceFindInput.value;
+                    replaceCurrentOrNext(replaceFindInput.value, replaceWithInput.value);
+                    focusEditor();
+                } else if (action === 'replace-all') {
+                    state.lastFindText = replaceFindInput.value;
+                    replaceAll(replaceFindInput.value, replaceWithInput.value);
+                    focusEditor();
+                } else if (action === 'replace-close' || action === 'about-close') {
+                    closeDialogs();
+                    focusEditor();
+                }
+            });
+        });
+
+        filePicker.addEventListener('change', () => {
+            const file = filePicker.files && filePicker.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                editor.value = String(reader.result || '');
+                state.fileName = file.name || 'Untitled.txt';
+                setDirty(false);
+                updateCursorStatus();
+                focusEditor();
+            };
+            reader.readAsText(file);
+        });
+
+        editor.addEventListener('input', () => {
+            setDirty(true);
+            updateCursorStatus();
+        });
+
+        ['click', 'keyup', 'select', 'mouseup'].forEach((eventName) => {
+            editor.addEventListener(eventName, updateCursorStatus);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeMenus();
+                closeDialogs();
+                focusEditor();
+                return;
+            }
+
+            if (event.key === 'F5') {
+                event.preventDefault();
+                insertTimeDate();
+                return;
+            }
+
+            if (!event.ctrlKey && !event.metaKey) return;
+
+            const key = event.key.toLowerCase();
+
+            if (key === 'n') {
+                event.preventDefault();
+                newDocument();
+            } else if (key === 'o') {
+                event.preventDefault();
+                openDocument();
+            } else if (key === 's' && event.shiftKey) {
+                event.preventDefault();
+                saveDocument(true);
+            } else if (key === 's') {
+                event.preventDefault();
+                saveDocument(false);
+            } else if (key === 'f') {
+                event.preventDefault();
+                executeCommand('find');
+            } else if (key === 'h') {
+                event.preventDefault();
+                executeCommand('replace');
+            } else if (key === 'a') {
+                event.preventDefault();
+                executeCommand('select-all');
+            } else if (key === '=' || key === '+') {
+                event.preventDefault();
+                executeCommand('zoom-in');
+            } else if (key === '-') {
+                event.preventDefault();
+                executeCommand('zoom-out');
+            } else if (key === '0') {
+                event.preventDefault();
+                executeCommand('zoom-reset');
+            }
+        });
+
+        applyWordWrapState();
+        setMenuChecked(statusBarOption, state.statusBarVisible);
+        applyZoom();
+        updateTitle();
+        updateCursorStatus();
+        focusEditor();
+        
+        // ── Source Code Inspect Block js code ────────
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+            document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.key == 'u') || (e.ctrlKey && e.shiftKey && e.key == 'I')) {
+                return false;
+              }
+            }
+            
+    </script>
+</body>
+</html>

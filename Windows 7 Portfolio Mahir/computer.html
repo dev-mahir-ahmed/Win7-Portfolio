@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Computer</title>
+    <link rel="stylesheet" href="css/apps.css">
+    <style>
+        body {
+            background-color: #f0f4f9; /* Windows explorer background */
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .explorer-toolbar {
+            background: linear-gradient(to bottom, #f2f6fb 0%, #e4ebf6 100%);
+            border-bottom: 1px solid #c4ccda;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .nav-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #555;
+        }
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.5);
+            border-color: #b5c4df;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .nav-btn svg { width: 16px; height: 16px; }
+        
+        .address-bar {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #bcc6d5;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        .address-bar img { width: 16px; height: 16px; margin-right: 8px; }
+        .address-bar.search-box {
+            flex: 0 0 200px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .explorer-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 200px;
+            background: #f0f4f9;
+            border-right: 1px solid #d9e3f1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+        .sidebar-group { margin-bottom: 15px; }
+        .sidebar-title {
+            font-size: 11px;
+            color: #003399;
+            font-weight: bold;
+            padding: 5px 15px;
+            text-transform: uppercase;
+        }
+        .sidebar-item {
+            padding: 6px 15px 6px 30px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar-item:hover {
+            background: #dbeefd;
+            border: 1px solid #bce4fe;
+            padding: 5px 14px 5px 29px; /* adjust for border */
+        }
+        .sidebar-item img { width: 16px; height: 16px; margin-right: 8px; }
+        
+        .main-view {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .drive-section {
+            margin-bottom: 30px;
+        }
+        .drive-title {
+            font-size: 14px;
+            color: #003399;
+            border-bottom: 1px solid #d9e3f1;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .drive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .drive-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .drive-item:hover {
+            background: #dbeefd;
+            border-color: #bce4fe;
+        }
+        .drive-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 15px;
+        }
+        .drive-info {
+            flex: 1;
+        }
+        .drive-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .drive-bar-bg {
+            height: 12px;
+            background: #e6e6e6;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        .drive-bar-fill {
+            height: 100%;
+            background: linear-gradient(to bottom, #7cbdff 0%, #2e8dec 100%);
+        }
+        .drive-bar-fill.warning {
+            background: linear-gradient(to bottom, #f08b8b 0%, #e03a3a 100%);
+        }
+        .drive-stats {
+            font-size: 12px;
+            color: #666;
+        }
+        .status-bar {
+            background: #f0f4f9;
+            border-top: 1px solid #d9e3f1;
+            padding: 4px 15px;
+            font-size: 12px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 780px) {
+            .explorer-toolbar {
+                padding: 6px 8px;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                width: 24px;
+                height: 24px;
+            }
+
+            .address-bar {
+                padding: 4px 8px;
+                font-size: 12px;
+                min-width: 0;
+            }
+
+            .address-bar.search-box {
+                display: none;
+            }
+
+            .sidebar {
+                width: 160px;
+            }
+
+            .main-view {
+                padding: 12px;
+            }
+
+            .drive-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .explorer-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 150px;
+                border-right: none;
+                border-bottom: 1px solid #d9e3f1;
+                padding: 8px 0;
+            }
+
+            .sidebar-title {
+                padding: 4px 10px;
+            }
+
+            .sidebar-item {
+                padding: 5px 10px;
+            }
+
+            .sidebar-item:hover {
+                padding: 4px 9px;
+            }
+
+            .main-view {
+                padding: 10px;
+            }
+
+            .drive-icon {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+
+            .drive-name {
+                font-size: 13px;
+            }
+
+            .status-bar {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/Mahir.jpg"/>
+</head>
+<body>
+    <div class="explorer-toolbar">
+        <div class="nav-btn" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+        <div class="nav-btn" title="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        
+        <div class="address-bar">
+            <span>Computer</span>
+        </div>
+        
+        <div class="address-bar search-box">
+            <input type="text" id="computer-search" placeholder="Search Computer" style="border: none; outline: none; font-style: italic; width: 100%; color: #555;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="width: 14px; height: 14px; margin-left: auto;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+    </div>
+    
+    <div class="explorer-content">
+        <div class="sidebar">
+            <div class="sidebar-group">
+                <div class="sidebar-title">Favorites</div>
+                <div class="sidebar-item" onclick="openApp('projects')">Desktop</div>
+                <div class="sidebar-item" onclick="openApp('projects')">Downloads</div>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-title">Libraries</div>
+                <div class="sidebar-item" onclick="openApp('resume')">Documents</div>
+                <div class="sidebar-item" onclick="openApp('projects')">Github Repos</div>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-title">Computer</div>
+                <div class="sidebar-item" style="font-weight:bold; color:#000;">Local Disk (C:)</div>
+            </div>
+        </div>
+        
+        <div class="main-view">
+            <div class="drive-section">
+                <div class="drive-title">Hard Disk Drives (1)</div>
+                <div class="drive-grid">
+                    
+                    <div class="drive-item" title="Local OS Drive">
+                        <svg class="drive-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="24" width="48" height="24" rx="3" fill="#c0c0c0" stroke="#777" stroke-width="1.5"/>
+                            <rect x="12" y="28" width="40" height="16" fill="#a0a0a0" />
+                            <circle cx="20" cy="36" r="4" fill="#444" />
+                            <circle cx="44" cy="36" r="4" fill="#444" />
+                            <path d="M26 36 L38 36" stroke="#444" stroke-width="2" stroke-linecap="round" />
+                            <rect x="10" y="22" width="20" height="4" fill="#fff" opacity="0.6"/>
+                            <!-- Windows Logo sticker -->
+                            <rect x="12" y="16" width="12" height="10" fill="#fff" stroke="#999" stroke-width="1"/>
+                            <rect x="14" y="18" width="4" height="3" fill="#F85731"/>
+                            <rect x="18" y="18" width="4" height="3" fill="#79C229"/>
+                            <rect x="14" y="21" width="4" height="3" fill="#01A3EE"/>
+                            <rect x="18" y="21" width="4" height="3" fill="#FCBC1F"/>
+                        </svg>
+                        <div class="drive-info">
+                            <div class="drive-name">Local Disk (C:)</div>
+                            <div class="drive-bar-bg">
+                                <div class="drive-bar-fill" style="width: 73%;"></div>
+                            </div>
+                            <div class="drive-stats">124 GB free of 480 GB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="drive-section">
+                <div class="drive-title">GitHub Repositories (Network Location)</div>
+                <div class="drive-grid">
+                    
+                    <div class="drive-item" onclick="openApp('projects')">
+                        <svg class="drive-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 8 16 L 24 16 L 28 22 L 56 22 C 58 22 60 24 60 26 L 60 48 C 60 50 58 52 56 52 L 8 52 C 6 52 4 50 4 48 L 4 20 C 4 18 6 16 8 16 Z" fill="#b3d4fc" stroke="#5a8bce" stroke-width="1.5" />
+                            <path d="M 4 52 L 12 28 C 12.5 26.5 14 25.5 15.5 25.5 L 61 25.5 C 63 25.5 63.5 27.5 62.5 29 L 56 52 Z" fill="#d0e5ff" stroke="#7aa3e5" stroke-width="1.5" />
+                            <!-- Web icon overlay -->
+                            <circle cx="32" cy="38" r="8" fill="#1E90FF" stroke="#fff" stroke-width="1" />
+                            <path d="M32 30 C 36 30 39 34 39 38 C 39 42 36 46 32 46 C 28 46 25 42 25 38 C 25 34 28 30 32 30 Z" fill="none" stroke="#fff" stroke-width="0.5"/>
+                            <path d="M 27 38 L 37 38" fill="none" stroke="#fff" stroke-width="0.5" />
+                        </svg>
+                        <div class="drive-info">
+                            <div class="drive-name">Mahir Ahmed (\\GITHUB) (X:)</div>
+                            <div class="drive-bar-bg">
+                                <div class="drive-bar-fill warning" style="width: 5%;"></div>
+                            </div>
+                            <div class="drive-stats">1 Projects Detected</div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="drive-section">
+                <div class="drive-title">System Information</div>
+                <div style="font-size: 13px; color: #444; line-height: 1.6;">
+                    <p><strong>Owner:</strong> Mahir Ahmed</p>
+                    <p><strong>Role:</strong> Front-End Developer</p>
+                    <p><strong>System Uptime:</strong> <span id="uptime">0 minutes</span></p>
+                    <button style="margin-top: 10px; padding: 6px 12px; cursor: pointer; border: 1px solid #999; border-radius: 3px; background: #e1e1e1;" onclick="openApp('terminal')">Launch Terminal Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="status-bar">
+        <span>3 items</span>
+        <span style="display:flex; align-items:center; gap: 5px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            System Secured
+        </span>
+    </div>
+
+    <script>
+        // Use parent WindowManager to open other apps from inside My Computer
+        function openApp(appId) {
+            if (window.parent && window.parent.WindowManager) {
+                window.parent.WindowManager.openApp(appId);
+            }
+        }
+        
+        // Search Logic
+        document.getElementById('computer-search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            let visibleCount = 0;
+            document.querySelectorAll('.drive-item').forEach(el => {
+                const text = el.innerText.toLowerCase();
+                const match = text.includes(term);
+                el.style.display = match ? 'flex' : 'none';
+                if (match) visibleCount++;
+            });
+            // Hide section generic info if searching
+            document.querySelectorAll('.drive-section').forEach(sec => {
+                if (!sec.querySelector('.drive-item')) {
+                    sec.style.display = term ? 'none' : 'block';
+                }
+            });
+        });
+        
+        // Track fake uptime
+        const bootTime = Date.now();
+        setInterval(() => {
+            const mins = Math.floor((Date.now() - bootTime) / 60000);
+            const secs = Math.floor(((Date.now() - bootTime) % 60000) / 1000);
+            document.getElementById('uptime').innerText = `${mins} minutes, ${secs} seconds`;
+        }, 1000);
+
+        // ── Source Code Inspect Block js code ────────
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+            document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.key == 'u') || (e.ctrlKey && e.shiftKey && e.key == 'I')) {
+                return false;
+              }
+            }
+    </script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint</title>
+    <link rel="stylesheet" href="css/apps.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .toolbar {
+            background: linear-gradient(to bottom, #f5f8fc, #c3cfdd);
+            border-bottom: 1px solid #999;
+            padding: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 5px;
+            padding-right: 15px;
+            border-right: 1px solid #a0a0a0;
+            align-items: center;
+        }
+
+        .tool-group:last-child {
+            border-right: none;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: #333;
+        }
+
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #a2caea;
+            box-shadow: 0 0 3px rgba(162, 202, 234, 0.5);
+        }
+
+        button.active {
+            background-color: #cce8ff;
+            border: 1px solid #99d1ff;
+        }
+
+        button svg {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 2px;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+        }
+
+        .color-swatch {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #a0a0a0;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .color-swatch.active {
+            border: 2px solid #000;
+        }
+
+        .current-color {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #a0a0a0;
+            background-color: #000000;
+            margin-right: 10px;
+        }
+
+        #size-select {
+            padding: 3px;
+            border: 1px solid #a0a0a0;
+            border-radius: 2px;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #d1d9e5;
+            overflow: auto;
+            position: relative;
+        }
+
+        canvas {
+            background-color: white;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="tool-group">
+            <button id="btn-pencil" class="active" title="Pencil">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    <path d="M2 2l7.586 7.586"></path>
+                    <circle cx="11" cy="11" r="2"></circle>
+                </svg>
+                Pencil
+            </button>
+            <button id="btn-fill" title="Fill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 11l-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L19 11z"></path>
+                    <path d="M5 2l5 5"></path>
+                    <path d="M2 13h15"></path>
+                    <path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-3.4 2-3.8.3.4 2 2.2 2 3.8z"></path>
+                </svg>
+                Fill
+            </button>
+            <button id="btn-eraser" title="Eraser">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path>
+                    <path d="M17 17L7 7"></path>
+                </svg>
+                Eraser
+            </button>
+            <button id="btn-clear" title="Clear Canvas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Clear
+            </button>
+        </div>
+        <div class="tool-group">
+            <button id="btn-line" title="Line">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="19" x2="19" y2="5"></line>
+                </svg>
+                Line
+            </button>
+            <button id="btn-rect" title="Rectangle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+                Rect
+            </button>
+            <button id="btn-circle" title="Circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                Circle
+            </button>
+        </div>
+        <div class="tool-group">
+            <div style="font-size: 11px; margin-right: 5px;">Size:</div>
+            <select id="size-select">
+                <option value="1">1px</option>
+                <option value="3" selected>3px</option>
+                <option value="5">5px</option>
+                <option value="8">8px</option>
+                <option value="12">12px</option>
+                <option value="20">20px</option>
+            </select>
+        </div>
+        <div class="tool-group">
+            <div class="current-color" id="current-color"></div>
+            <div class="color-picker" id="color-picker">
+                <!-- Colors injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-container" id="canvas-container">
+        <canvas id="paint-canvas" width="600" height="400"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('paint-canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        let isDrawing = false;
+        let currentTool = 'pencil'; // 'pencil', 'eraser', 'fill', 'line', 'rect', 'circle'
+        let currentColor = '#000000';
+        let currentSize = 3;
+        
+        // For shapes
+        let startX, startY;
+        let snapshot;
+
+        // Colors palette (Windows 7 style)
+        const colors = [
+            '#000000', '#7f7f7f', '#880015', '#ed1c24', '#ff7f27', '#fff200', '#22b14c', '#00a2e8', '#3f48cc', '#a349a4',
+            '#ffffff', '#c3c3c3', '#b97a57', '#ffaec9', '#ffc90e', '#efe4b0', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7'
+        ];
+
+        // Init white background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Setup colors
+        const colorPicker = document.getElementById('color-picker');
+        const currentColorDisplay = document.getElementById('current-color');
+
+        colors.forEach((color, index) => {
+            const swatch = document.createElement('div');
+            swatch.className = 'color-swatch';
+            if (color === currentColor) swatch.classList.add('active');
+            swatch.style.backgroundColor = color;
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                currentColor = color;
+                currentColorDisplay.style.backgroundColor = color;
+                if (currentTool === 'eraser') {
+                    setTool('pencil');
+                }
+            });
+            colorPicker.appendChild(swatch);
+        });
+
+        // Tools
+        const btnPencil = document.getElementById('btn-pencil');
+        const btnEraser = document.getElementById('btn-eraser');
+        const btnFill = document.getElementById('btn-fill');
+        const btnLine = document.getElementById('btn-line');
+        const btnRect = document.getElementById('btn-rect');
+        const btnCircle = document.getElementById('btn-circle');
+        const btnClear = document.getElementById('btn-clear');
+        const sizeSelect = document.getElementById('size-select');
+        
+        const toolBtns = [btnPencil, btnEraser, btnFill, btnLine, btnRect, btnCircle];
+
+        function setTool(tool) {
+            currentTool = tool;
+            toolBtns.forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tool).classList.add('active');
+        }
+
+        btnPencil.addEventListener('click', () => setTool('pencil'));
+        btnEraser.addEventListener('click', () => setTool('eraser'));
+        btnFill.addEventListener('click', () => setTool('fill'));
+        btnLine.addEventListener('click', () => setTool('line'));
+        btnRect.addEventListener('click', () => setTool('rect'));
+        btnCircle.addEventListener('click', () => setTool('circle'));
+        
+        btnClear.addEventListener('click', () => {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+
+        sizeSelect.addEventListener('change', (e) => {
+            currentSize = parseInt(e.target.value);
+        });
+
+        // Drawing Logic
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Calculate scale based on actual size vs styled size
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+        
+        // Helper: convert hex to rgb array
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? [
+                parseInt(result[1], 16),
+                parseInt(result[2], 16),
+                parseInt(result[3], 16),
+                255
+            ] : [0, 0, 0, 255];
+        }
+
+        // Helper: exact color match for flood fill
+        function matchStartColor(pixelPos, colorLayerData, startR, startG, startB, startA) {
+            return (
+                colorLayerData[pixelPos] === startR &&
+                colorLayerData[pixelPos + 1] === startG &&
+                colorLayerData[pixelPos + 2] === startB &&
+                colorLayerData[pixelPos + 3] === startA
+            );
+        }
+
+        // Fast scanline flood fill
+        function floodFill(startX, startY, fillColorArr) {
+            const colorLayer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const w = colorLayer.width;
+            const h = colorLayer.height;
+            const pixelData = colorLayer.data;
+            
+            const pixelPos = (startY * w + startX) * 4;
+            const startR = pixelData[pixelPos];
+            const startG = pixelData[pixelPos + 1];
+            const startB = pixelData[pixelPos + 2];
+            const startA = pixelData[pixelPos + 3];
+
+            // Avoid infinite loop if clicking same color
+            if (startR === fillColorArr[0] && startG === fillColorArr[1] && startB === fillColorArr[2] && startA === fillColorArr[3]) {
+                return;
+            }
+
+            const pixelStack = [[startX, startY]];
+
+            while (pixelStack.length) {
+                const newPos = pixelStack.pop();
+                let x = newPos[0];
+                let y = newPos[1];
+
+                let currentPixelPos = (y * w + x) * 4;
+                while (y-- >= 0 && matchStartColor(currentPixelPos, pixelData, startR, startG, startB, startA)) {
+                    currentPixelPos -= w * 4;
+                }
+                currentPixelPos += w * 4;
+                ++y;
+
+                let reachLeft = false;
+                let reachRight = false;
+
+                while (y++ < h - 1 && matchStartColor(currentPixelPos, pixelData, startR, startG, startB, startA)) {
+                    pixelData[currentPixelPos] = fillColorArr[0];
+                    pixelData[currentPixelPos + 1] = fillColorArr[1];
+                    pixelData[currentPixelPos + 2] = fillColorArr[2];
+                    pixelData[currentPixelPos + 3] = fillColorArr[3];
+
+                    if (x > 0) {
+                        if (matchStartColor(currentPixelPos - 4, pixelData, startR, startG, startB, startA)) {
+                            if (!reachLeft) {
+                                pixelStack.push([x - 1, y]);
+                                reachLeft = true;
+                            }
+                        } else if (reachLeft) {
+                            reachLeft = false;
+                        }
+                    }
+
+                    if (x < w - 1) {
+                        if (matchStartColor(currentPixelPos + 4, pixelData, startR, startG, startB, startA)) {
+                            if (!reachRight) {
+                                pixelStack.push([x + 1, y]);
+                                reachRight = true;
+                            }
+                        } else if (reachRight) {
+                            reachRight = false;
+                        }
+                    }
+
+                    currentPixelPos += w * 4;
+                }
+            }
+            
+            ctx.putImageData(colorLayer, 0, 0);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return; // Only left click
+            const pos = getMousePos(e);
+            
+            if (currentTool === 'fill') {
+                floodFill(Math.floor(pos.x), Math.floor(pos.y), hexToRgb(currentColor));
+                return;
+            }
+
+            isDrawing = true;
+            startX = pos.x;
+            startY = pos.y;
+            
+            if (currentTool === 'pencil' || currentTool === 'eraser') {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineWidth = currentSize;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+                ctx.lineTo(startX, startY);
+                ctx.stroke();
+            } else {
+                // shape drawing starts, save snapshot of canvas
+                snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const pos = getMousePos(e);
+
+            if (currentTool === 'pencil' || currentTool === 'eraser') {
+                ctx.lineWidth = currentSize;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            } else if (currentTool === 'line' || currentTool === 'rect' || currentTool === 'circle') {
+                // restore snapshot for preview
+                ctx.putImageData(snapshot, 0, 0);
+                
+                ctx.beginPath();
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+                ctx.lineCap = 'round';
+                
+                if (currentTool === 'line') {
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(pos.x, pos.y);
+                } else if (currentTool === 'rect') {
+                    ctx.rect(startX, startY, pos.x - startX, pos.y - startY);
+                } else if (currentTool === 'circle') {
+                    const radius = Math.sqrt(Math.pow(pos.x - startX, 2) + Math.pow(pos.y - startY, 2));
+                    ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                }
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDrawing = false;
+        });
+
+        // Responsive canvas sizing
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                // Update canvas visual display but keep backing store fixed to avoid stretching
+                const width = Math.max(800, entry.contentRect.width - 20); // allow scrolling if needed
+                const height = Math.max(600, entry.contentRect.height - 20);
+                
+                if (canvas.width !== width || canvas.height !== height) {
+                    // Create temp canvas to save drawing
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = canvas.width;
+                    tempCanvas.height = canvas.height;
+                    tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+                    
+                    // Resize
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Restore background and drawing
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(tempCanvas, 0, 0);
+                }
+            }
+        });
+        
+        // Start observing container after short delay to allow initial layout
+        setTimeout(() => resizeObserver.observe(canvasContainer), 100);
+
+        // ── Source Code Inspect Block js code ────────
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+            document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.key == 'u') || (e.ctrlKey && e.shiftKey && e.key == 'I')) {
+                return false;
+              }
+            }
+            
+    </script>
+</body>
+</html>

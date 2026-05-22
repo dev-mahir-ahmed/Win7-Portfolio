@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Task Manager</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 12px;
+            user-select: none;
+        }
+
+        /* Menu Bar */
+        .menu-bar {
+            display: flex;
+            padding: 2px 5px;
+            background-color: #f5f6f7;
+            border-bottom: 1px solid #dfdfdf;
+        }
+        .menu-item {
+            padding: 3px 8px;
+            cursor: pointer;
+        }
+        .menu-item:hover {
+            background-color: #cce8ff;
+            outline: 1px solid #99d1ff;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            padding: 8px 8px 0 8px;
+            background-color: #f5f6f7;
+            position: relative;
+            z-index: 10;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #898c95;
+            padding-left: 2px;
+        }
+        .tab {
+            padding: 3px 8px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: -1px;
+            margin-bottom: -1px;
+            position: relative;
+            cursor: default;
+            color: #1e395b;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            border: 1px solid #898c95;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+        .tab.active {
+            background: #ffffff;
+            border-bottom: 1px solid #ffffff;
+            z-index: 2;
+        }
+        .tab:not(.active):hover {
+            background: linear-gradient(to bottom, #eaf6fd, #d7effc);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex-grow: 1;
+            background-color: #ffffff;
+            border: 1px solid #898c95;
+            border-top: none;
+            margin: 0 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        /* Tab Contents */
+        .tab-content {
+            display: none;
+            flex-grow: 1;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Processes DataGrid */
+        .datagrid-container {
+            flex-grow: 1;
+            border: 1px solid #828790;
+            overflow: auto;
+            position: relative;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(to bottom, #ffffff, #e0e2e5);
+            border-bottom: 1px solid #d9d9d9;
+            border-right: 1px solid #d9d9d9;
+            text-align: left;
+            padding: 3px 5px;
+            font-weight: normal;
+            border-bottom: 1px solid #a0a0a0;
+            z-index: 2;
+        }
+        th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 1px;
+            background-color: #a0a0a0;
+        }
+        th.sortable:hover {
+            background: linear-gradient(to bottom, #f2f9fe, #d6eefa);
+        }
+        
+        td {
+            padding: 2px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-right: 1px solid transparent; /* Align with headers */
+        }
+        
+        tr {
+            background-color: transparent;
+        }
+        tr.selected {
+            background-color: #3399ff !important;
+            color: white;
+        }
+        tr:nth-child(even):not(.selected) {
+            background-color: #f9f9f9;
+        }
+
+        /* Layout specifics for Applications Columns */
+        .col-app-name { width: 70%; }
+        .col-app-status { width: 30%; }
+
+        /* Layout specifics for Processes Columns */
+        .col-name { width: 25%; }
+        .col-pid { width: 10%; text-align: right; }
+        .col-user { width: 15%; }
+        .col-cpu { width: 8%; text-align: center; }
+        .col-mem { width: 17%; text-align: right; }
+        .col-desc { width: 25%; }
+
+        /* Layout specifics for Services Columns */
+        .col-srv-name { width: 20%; }
+        .col-srv-pid { width: 10%; text-align: right; }
+        .col-srv-desc { width: 35%; }
+        .col-srv-status { width: 15%; }
+        .col-srv-group { width: 20%; }
+
+        /* Layout specifics for Networking Columns */
+        .col-net-adapter { width: 40%; }
+        .col-net-util { width: 15%; text-align: center; }
+        .col-net-speed { width: 15%; text-align: right; }
+        .col-net-state { width: 30%; }
+        
+        /* Layout specifics for Users Columns */
+        .col-usr-name { width: 30%; }
+        .col-usr-id { width: 10%; text-align: right; }
+        .col-usr-status { width: 20%; }
+        .col-usr-client { width: 20%; }
+        .col-usr-session { width: 20%; }
+
+        td.number { text-align: right; }
+        td.center { text-align: center; }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+        }
+        button {
+            padding: 4px 12px;
+            background: linear-gradient(to bottom, #f2f2f2, #ebebeb);
+            border: 1px solid #707070;
+            border-radius: 3px;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #eaf6fd, #d9f0fc);
+            border-color: #3c7fb1;
+            box-shadow: 0 0 3px rgba(0, 120, 215, 0.5);
+            cursor: pointer;
+        }
+        button:disabled {
+            color: #888;
+            border-color: #ccc;
+        }
+        
+        /* Checkbox */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            background-color: #f0f0f0;
+            border-top: 1px solid #dfdfdf;
+            padding: 3px 8px;
+            color: #333;
+        }
+        .status-item {
+            border-right: 1px solid #dfdfdf;
+            padding-right: 15px;
+            margin-right: 15px;
+        }
+        .status-item:last-child {
+            border-right: none;
+        }
+
+        /* Performance Tab Styling */
+        .perf-container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            gap: 15px;
+        }
+        .perf-graphs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .perf-graph-box {
+            border: 1px solid #828790;
+            background: white;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .graph-title {
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            color: #333;
+            font-size: 11px;
+            z-index: 4;
+        }
+        .grid-line {
+            position: absolute;
+            background-color: #e6f0fa;
+            width: 100%;
+            height: 1px;
+            z-index: 1;
+        }
+        .grid-line-v {
+            position: absolute;
+            background-color: #e6f0fa;
+            width: 1px;
+            height: 100%;
+            z-index: 1;
+        }
+        canvas.perf-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+        .perf-stats {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .stat-group h3 {
+            margin: 0 0 5px 0;
+            font-size: 11px;
+            font-weight: normal;
+            color: #666;
+        }
+        .stat-group p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Under Construction Tab */
+        .construction {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #666;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-bar">
+        <div class="menu-item">File</div>
+        <div class="menu-item">Options</div>
+        <div class="menu-item">View</div>
+        <div class="menu-item">Help</div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <div class="tab" data-target="applications">Applications</div>
+            <div class="tab active" data-target="processes">Processes</div>
+            <div class="tab" data-target="services">Services</div>
+            <div class="tab" data-target="performance">Performance</div>
+            <div class="tab" data-target="networking">Networking</div>
+            <div class="tab" data-target="users">Users</div>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <!-- Processes Tab -->
+        <div id="tab-processes" class="tab-content active">
+            <div class="datagrid-container">
+                <table id="process-table">
+                    <thead>
+                        <tr>
+                            <th class="col-name sortable">Image Name</th>
+                            <th class="col-pid sortable">PID</th>
+                            <th class="col-user sortable">User Name</th>
+                            <th class="col-cpu sortable">CPU</th>
+                            <th class="col-mem sortable">Memory (Private Working Set)</th>
+                            <th class="col-desc sortable">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="process-list">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-bar">
+                <label class="checkbox-label">
+                    <input type="checkbox" checked> Show processes from all users
+                </label>
+                <button id="btn-end-process" disabled>End Process</button>
+            </div>
+        </div>
+
+        <!-- Performance Tab -->
+        <div id="tab-performance" class="tab-content">
+            <div class="perf-container">
+                <div class="perf-graphs">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:-5px;">
+                        <span style="font-size:16px;">CPU Usage</span>
+                        <span style="font-size:16px;">Memory</span>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-grow:1;">
+                        <div class="perf-graph-box" id="cpu-graph-container">
+                            <span class="graph-title">CPU Usage %</span>
+                            <canvas id="cpu-canvas" class="perf-canvas"></canvas>
+                        </div>
+                        <div class="perf-graph-box" id="mem-graph-container">
+                            <span class="graph-title">Physical Memory Usage</span>
+                            <canvas id="mem-canvas" class="perf-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="perf-stats">
+                        <div class="stat-group">
+                            <h3>Physical Memory (MB)</h3>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Total</span><span>8192</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Cached</span><span>2048</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Available</span><span id="mem-avail">6020</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Free</span><span id="mem-free">3900</span>
+                            </div>
+                        </div>
+                        <div class="stat-group">
+                            <h3>System</h3>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Handles</span><span id="sys-handles">16394</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Threads</span><span id="sys-threads">768</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Processes</span><span id="sys-processes">52</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; width:150px;">
+                                <span>Up Time</span><span id="sys-uptime">0:14:00:23</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Tab -->
+        <div id="tab-applications" class="tab-content">
+            <div class="datagrid-container">
+                <table id="app-table">
+                    <thead>
+                        <tr>
+                            <th class="col-app-name sortable">Task</th>
+                            <th class="col-app-status sortable">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="app-list">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-bar" style="justify-content: flex-end; gap: 10px;">
+                <button id="btn-end-task" disabled>End Task</button>
+                <button disabled>Switch To</button>
+                <button disabled>New Task...</button>
+            </div>
+        </div>
+
+        <!-- Services Tab -->
+        <div id="tab-services" class="tab-content">
+            <div class="datagrid-container">
+                <table id="service-table">
+                    <thead>
+                        <tr>
+                            <th class="col-srv-name sortable">Name</th>
+                            <th class="col-srv-pid sortable">PID</th>
+                            <th class="col-srv-desc sortable">Description</th>
+                            <th class="col-srv-status sortable">Status</th>
+                            <th class="col-srv-group sortable">Group</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-list">
+                        <tr><td>Audiosrv</td><td class="number">1184</td><td>Windows Audio</td><td>Running</td><td>LocalServiceNetworkRestricted</td></tr>
+                        <tr><td>BFE</td><td class="number">1044</td><td>Base Filtering Engine</td><td>Running</td><td>LocalServiceNoNetwork</td></tr>
+                        <tr><td>CryptSvc</td><td class="number">1044</td><td>Cryptographic Services</td><td>Running</td><td>NetworkService</td></tr>
+                        <tr><td>Dhcp</td><td class="number">1044</td><td>DHCP Client</td><td>Running</td><td>LocalServiceNetworkRestricted</td></tr>
+                        <tr><td>EventLog</td><td class="number">1080</td><td>Windows Event Log</td><td>Running</td><td>LocalServiceNetworkRestricted</td></tr>
+                        <tr><td>lmhosts</td><td class="number">916</td><td>TCP/IP NetBIOS Helper</td><td>Running</td><td>LocalServiceNetworkRestricted</td></tr>
+                        <tr><td>MpsSvc</td><td class="number">1044</td><td>Windows Firewall</td><td>Running</td><td>LocalServiceNoNetwork</td></tr>
+                        <tr><td>PlugPlay</td><td class="number">748</td><td>Plug and Play</td><td>Running</td><td>DcomLaunch</td></tr>
+                        <tr><td>Spooler</td><td class="number">1540</td><td>Print Spooler</td><td>Running</td><td>SpoolerGroup</td></tr>
+                        <tr><td>TimeBroker</td><td class="number">0</td><td>Time Broker</td><td>Stopped</td><td>LocalService</td></tr>
+                        <tr><td>Winmgmt</td><td class="number">1044</td><td>Windows Management Instrume...</td><td>Running</td><td>netsvcs</td></tr>
+                        <tr><td>wuauserv</td><td class="number">0</td><td>Windows Update</td><td>Stopped</td><td>netsvcs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-bar" style="justify-content: flex-end;">
+                <button disabled>Services...</button>
+            </div>
+        </div>
+
+        <!-- Networking Tab -->
+        <div id="tab-networking" class="tab-content">
+            <div class="perf-container" style="flex-direction: column;">
+                <div class="perf-graph-box" style="height: 150px; flex-grow: 0;" id="net-graph-container">
+                    <span class="graph-title">Local Area Connection</span>
+                    <canvas id="net-canvas" class="perf-canvas"></canvas>
+                </div>
+                <div class="datagrid-container" style="margin-top: 10px; flex-grow: 1;">
+                    <table id="network-table">
+                        <thead>
+                            <tr>
+                                <th class="col-net-adapter sortable">Adapter Name</th>
+                                <th class="col-net-util sortable">Network Utilization</th>
+                                <th class="col-net-speed sortable">Link Speed</th>
+                                <th class="col-net-state sortable">State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="network-list">
+                            <tr>
+                                <td>Local Area Connection</td>
+                                <td class="center" id="net-util-text">0.3 %</td>
+                                <td class="number">1 Gbps</td>
+                                <td>Operational</td>
+                            </tr>
+                            <tr>
+                                <td>Wireless Network Connection</td>
+                                <td class="center">0 %</td>
+                                <td class="number">54 Mbps</td>
+                                <td>Disconnected</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Users Tab -->
+        <div id="tab-users" class="tab-content">
+            <div class="datagrid-container">
+                <table id="user-table">
+                    <thead>
+                        <tr>
+                            <th class="col-usr-name sortable">User</th>
+                            <th class="col-usr-id sortable">ID</th>
+                            <th class="col-usr-status sortable">Status</th>
+                            <th class="col-usr-client sortable">Client Name</th>
+                            <th class="col-usr-session sortable">Session</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-list">
+                        <tr class="selected">
+                            <td>Mahir Ahmed</td>
+                            <td class="number">1</td>
+                            <td>Active</td>
+                            <td></td>
+                            <td>Console</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-bar" style="justify-content: flex-end; gap: 10px;">
+                <button disabled>Disconnect</button>
+                <button disabled>Logoff</button>
+                <button disabled>Send Message...</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="status-bar">
+        <div class="status-item" id="status-processes">Processes: 52</div>
+        <div class="status-item" id="status-cpu">CPU Usage: 5%</div>
+        <div class="status-item" id="status-mem">Physical Memory: 26%</div>
+    </div>
+
+    <script>
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-target');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`tab-${target}`).classList.add('active');
+                
+                // Trigger resize to fix canvas widths for newly visible tabs
+                window.dispatchEvent(new Event('resize'));
+            });
+        });
+
+        // Background System Processes
+        const systemProcesses = [
+            { name: 'System Idle Process', pid: 0, user: 'SYSTEM', cpu: 95, mem: 24, desc: 'Percentage of time the processor is idle' },
+            { name: 'System', pid: 4, user: 'SYSTEM', cpu: 0, mem: 56, desc: 'NT Kernel & System' },
+            { name: 'smss.exe', pid: 272, user: 'SYSTEM', cpu: 0, mem: 120, desc: 'Windows Session Manager' },
+            { name: 'csrss.exe', pid: 496, user: 'SYSTEM', cpu: 0, mem: 1276, desc: 'Client Server Runtime Process' },
+            { name: 'wininit.exe', pid: 564, user: 'SYSTEM', cpu: 0, mem: 340, desc: 'Windows Start-Up Application' },
+            { name: 'csrss.exe', pid: 572, user: 'SYSTEM', cpu: 0, mem: 2400, desc: 'Client Server Runtime Process' },
+            { name: 'services.exe', pid: 616, user: 'SYSTEM', cpu: 0, mem: 4620, desc: 'Services and Controller app' },
+            { name: 'lsass.exe', pid: 636, user: 'SYSTEM', cpu: 0, mem: 1840, desc: 'Local Security Authority Process' },
+            { name: 'lsm.exe', pid: 644, user: 'SYSTEM', cpu: 0, mem: 920, desc: 'Local Session Manager Service' },
+            { name: 'svchost.exe', pid: 748, user: 'SYSTEM', cpu: 0, mem: 4100, desc: 'Host Process for Windows Services' },
+            { name: 'svchost.exe', pid: 824, user: 'NETWORK SERVICE', cpu: 0, mem: 3200, desc: 'Host Process for Windows Services' },
+            { name: 'svchost.exe', pid: 916, user: 'LOCAL SERVICE', cpu: 0, mem: 5120, desc: 'Host Process for Windows Services' },
+            { name: 'svchost.exe', pid: 1044, user: 'SYSTEM', cpu: 0, mem: 17400, desc: 'Host Process for Windows Services' },
+            { name: 'svchost.exe', pid: 1080, user: 'LOCAL SERVICE', cpu: 0, mem: 9800, desc: 'Host Process for Windows Services' },
+            { name: 'audiodg.exe', pid: 1184, user: 'LOCAL SERVICE', cpu: 0, mem: 14200, desc: 'Windows Audio Device Graph Isolation' },
+            { name: 'dwm.exe', pid: 1248, user: 'Mahir Ahmed', cpu: 1, mem: 24500, desc: 'Desktop Window Manager' },
+            { name: 'explorer.exe', pid: 1392, user: 'Mahir Ahmed', cpu: 0, mem: 41200, desc: 'Windows Explorer' },
+            { name: 'taskhost.exe', pid: 1424, user: 'Mahir Ahmed', cpu: 0, mem: 3500, desc: 'Host Process for Windows Tasks' },
+            { name: 'spoolsv.exe', pid: 1540, user: 'SYSTEM', cpu: 0, mem: 6300, desc: 'Spooler SubSystem App' },
+            { name: 'taskmgr.exe', pid: 2896, user: 'Mahir Ahmed', cpu: 4, mem: 10720, desc: 'Task Manager' }
+        ];
+
+        // Process Management
+        const processList = document.getElementById('process-list');
+        const btnEndProcess = document.getElementById('btn-end-process');
+        let selectedProcessId = null; // Either a PID (number) or Window ID (string)
+        let processesData = []; // Combined array for rendering
+
+        let fetchedActiveApps = [];
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'windowsList') {
+                fetchedActiveApps = event.data.windows
+                    .filter(w => w.appId !== 'taskmanager')
+                    .map(win => ({
+                        name: win.appId + '.exe',
+                        appId: win.appId,
+                        pid: 'win_' + win.id,
+                        user: 'Mahir Ahmed',
+                        cpu: Math.floor(Math.random() * 3),
+                        mem: Math.floor(Math.random() * 50000) + 12000,
+                        desc: win.title,
+                        iconSvg: win.iconSvg,
+                        isRealWindow: true,
+                        winId: win.id
+                    }));
+            }
+        });
+
+        function fetchRunningApps() {
+            try {
+                if (window.parent) {
+                    window.parent.postMessage({ type: 'getWindows' }, '*');
+                }
+            } catch(e) {}
+            return fetchedActiveApps;
+        }
+
+        function formatMem(kb) {
+            return kb.toLocaleString() + ' K';
+        }
+
+        function renderProcesses() {
+            processList.innerHTML = '';
+            
+            const activeApps = fetchRunningApps();
+            // Create a fresh array of current processes
+            processesData = [...activeApps, ...systemProcesses].sort((a,b) => a.name.localeCompare(b.name));
+            
+            processesData.forEach(proc => {
+                const tr = document.createElement('tr');
+                if (selectedProcessId === proc.pid) {
+                    tr.classList.add('selected');
+                }
+                
+                // Add a small delay for styling to load before calculating text logic if needed
+                tr.innerHTML = `
+                    <td class="col-name">${proc.name}</td>
+                    <td class="col-pid number">${String(proc.pid).startsWith('win_') ? Math.floor(Math.random()*2000)+3000 : proc.pid}</td>
+                    <td class="col-user">${proc.user}</td>
+                    <td class="col-cpu center">${proc.cpu.toString().padStart(2, '0')}</td>
+                    <td class="col-mem number">${formatMem(proc.mem)}</td>
+                    <td class="col-desc">${proc.desc}</td>
+                `;
+
+                tr.addEventListener('click', () => {
+                    // Deselect previous
+                    document.querySelectorAll('#process-list tr').forEach(row => row.classList.remove('selected'));
+                    tr.classList.add('selected');
+                    selectedProcessId = proc.pid;
+                    btnEndProcess.disabled = false;
+                });
+
+                processList.appendChild(tr);
+            });
+            
+            document.getElementById('status-processes').innerText = `Processes: ${processesData.length}`;
+            document.getElementById('sys-processes').innerText = processesData.length;
+        }
+
+        // End Process Action
+        btnEndProcess.addEventListener('click', () => {
+            if (!selectedProcessId) return;
+            
+            const proc = processesData.find(p => p.pid === selectedProcessId);
+            if (!proc) return;
+            
+            if (proc.isRealWindow) {
+                // Instruct the parent OS via postMessage to close it safely
+                if (window.parent) {
+                    window.parent.postMessage({ type: 'closeWindow', winId: proc.winId }, '*');
+                    selectedProcessId = null;
+                    btnEndProcess.disabled = true;
+                    // Will naturally disappear on next 1000ms tick when windows list updates
+                }
+            } else {
+                // It's a fake background process
+                const confirmKill = confirm(`WARNING: Terminating a process can cause undesired results including loss of data and system instability. Are you sure you want to terminate ${proc.name}?`);
+                if (confirmKill) {
+                    if (proc.user === 'SYSTEM') {
+                        alert("Access Denied. You do not have permission to terminate a SYSTEM level process.");
+                    } else {
+                        // Remove from fake list
+                        const idx = systemProcesses.findIndex(p => p.pid === proc.pid);
+                        if (idx !== -1) systemProcesses.splice(idx, 1);
+                        selectedProcessId = null;
+                        btnEndProcess.disabled = true;
+                        renderProcesses();
+                    }
+                }
+            }
+        });
+
+        // Applications Tab Management
+        const appList = document.getElementById('app-list');
+        const btnEndTask = document.getElementById('btn-end-task');
+        let selectedAppWinId = null;
+
+        function renderApplications() {
+            appList.innerHTML = '';
+            const activeApps = fetchRunningApps().filter(p => p.isRealWindow); // Only actual user windows
+            
+            activeApps.forEach(app => {
+                const tr = document.createElement('tr');
+                if (selectedAppWinId === app.winId) {
+                    tr.classList.add('selected');
+                }
+                
+                let iconHtml = '';
+                if (app.iconSvg) {
+                    iconHtml = `<img src="${app.iconSvg}" style="width:14px; height:14px; margin-right:6px; vertical-align:middle;">`;
+                }
+                
+                tr.innerHTML = `
+                    <td class="col-app-name" style="border-right: none; padding-left: 6px;">${iconHtml}<span style="vertical-align: middle;">${app.desc}</span></td>
+                    <td class="col-app-status" style="border-right: none;">Running</td>
+                `;
+
+                tr.addEventListener('click', () => {
+                    document.querySelectorAll('#app-list tr').forEach(row => row.classList.remove('selected'));
+                    tr.classList.add('selected');
+                    selectedAppWinId = app.winId;
+                    btnEndTask.disabled = false;
+                });
+
+                appList.appendChild(tr);
+            });
+
+            // If selected app no longer exists, disable button
+            if (selectedAppWinId && !activeApps.find(a => a.winId === selectedAppWinId)) {
+                selectedAppWinId = null;
+                btnEndTask.disabled = true;
+            }
+        }
+
+        btnEndTask.addEventListener('click', () => {
+             if (selectedAppWinId) {
+                if (window.parent) {
+                    window.parent.postMessage({ type: 'closeWindow', winId: selectedAppWinId }, '*');
+                    selectedAppWinId = null;
+                    btnEndTask.disabled = true;
+                    // Processes and applications will re-render automatically on next tick
+                }
+            }
+        });
+
+        // Background update intervals
+        setInterval(() => {
+            const pGrid = document.querySelector('#tab-processes .datagrid-container');
+            const pScroll = pGrid ? pGrid.scrollTop : 0;
+            
+            // Re-render processes and apps frequently to catch newly opened apps
+            renderProcesses();
+            renderApplications();
+            
+            if (pGrid) pGrid.scrollTop = pScroll;
+        }, 1000);
+
+        setInterval(() => {
+            // Update CPU and Memory Randomly for realism
+            let cpuTotal = 0;
+            processesData.forEach(p => {
+                if (p.name !== 'System Idle Process') {
+                    // Fluctuate CPU slightly
+                    if (Math.random() > 0.7) {
+                        p.cpu = Math.max(0, p.cpu + (Math.floor(Math.random()*3)-1));
+                    }
+                    cpuTotal += p.cpu;
+                }
+            });
+            
+            const idleProc = systemProcesses.find(p => p.name === 'System Idle Process');
+            if (idleProc) {
+                idleProc.cpu = Math.max(0, 100 - cpuTotal);
+            }
+            
+            document.getElementById('status-cpu').innerText = `CPU Usage: ${cpuTotal}%`;
+            
+            // Re-render if processes tab is active instead of redrawing whole table?
+            // Since this runs every 2s, we can just let the 3s render handle the table updates.
+            
+        }, 2000);
+
+        // Performance Graphs Logic
+        function setupGraph(canvasId, color, gridColor, initialGenerator) {
+            const container = document.getElementById(canvasId).parentElement;
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Draw grid overlay in container via CSS
+            for(let i=1; i<10; i++) {
+                const line = document.createElement('div');
+                line.className = 'grid-line';
+                line.style.top = `${i*10}%`;
+                if(gridColor) line.style.backgroundColor = gridColor;
+                container.appendChild(line);
+                
+                const vline = document.createElement('div');
+                vline.className = 'grid-line-v';
+                vline.style.left = `${i*10}%`;
+                if(gridColor) vline.style.backgroundColor = gridColor;
+                container.appendChild(vline);
+            }
+
+            const dataPoints = Array(60).fill(0);
+            if (initialGenerator) {
+                for (let i = 0; i < 60; i++) {
+                    dataPoints[i] = initialGenerator();
+                }
+            }
+            
+            function resizeCanvas() {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+                
+                const step = canvas.width / (dataPoints.length - 1);
+                
+                for(let i=0; i<dataPoints.length; i++) {
+                    const x = i * step;
+                    const y = canvas.height - (dataPoints[i] / 100) * canvas.height;
+                    ctx.lineTo(x, y);
+                }
+                
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.closePath();
+                
+                // Fill Under Graph
+                ctx.fillStyle = `rgba(${color}, 0.15)`;
+                ctx.fill();
+                
+                // Line
+                ctx.strokeStyle = `rgb(${color})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            function addValue(val) {
+                dataPoints.push(val);
+                dataPoints.shift();
+                draw();
+            }
+            
+            // Initial draw attempt
+            if (container.clientWidth > 0) {
+                draw();
+            }
+
+            return { addValue, draw };
+        }
+
+        const cpuGraph = setupGraph('cpu-canvas', '17, 125, 187', '#e6f0fa', () => Math.max(2, Math.min(100, (Math.random() * 10) + (Math.random() > 0.8 ? 20 : 0))));    // Blue
+        const memGraph = setupGraph('mem-canvas', '139, 18, 174', '#f3e6f8', () => 26 + (Math.random() * 2 - 1));    // Purple
+        const netGraph = setupGraph('net-canvas', '196, 116, 4', '#faeedf', () => Math.random() > 0.85 ? (Math.random() * 80 + 10) : (Math.random() * 3));     // Orange
+        
+        let uptimeSecs = 84023; // Random start uptime
+        
+        function formatUptime(seconds) {
+            const d = Math.floor(seconds / (3600*24));
+            const h = Math.floor(seconds % (3600*24) / 3600);
+            const m = Math.floor(seconds % 3600 / 60);
+            const s = Math.floor(seconds % 60);
+            return `${d}:${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        setInterval(() => {
+            // CPU fluctuates between 2 and 15 commonly
+            const cpuVal = Math.max(2, Math.min(100, (Math.random() * 10) + (Math.random() > 0.8 ? 20 : 0)));
+            cpuGraph.addValue(cpuVal);
+            
+            // Mem fluctuates very slightly around 26%
+            const memVal = 26 + (Math.random() * 2 - 1);
+            memGraph.addValue(memVal);
+            
+            uptimeSecs++;
+            document.getElementById('sys-uptime').innerText = formatUptime(uptimeSecs);
+            
+            // Network fluctuation (huge spikes randomly, else low hum)
+            const netVal = Math.random() > 0.85 ? (Math.random() * 80 + 10) : (Math.random() * 3);
+            netGraph.addValue(netVal);
+            document.getElementById('net-util-text').innerText = netVal.toFixed(2) + ' %';
+            
+        }, 1000);
+
+        // Initial Render
+        renderProcesses();
+        renderApplications();
+
+    </script>
+</body>
+</html>

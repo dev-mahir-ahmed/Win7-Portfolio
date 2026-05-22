@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact</title>
+    <link rel="stylesheet" href="css/apps.css">
+
+    <style>
+        body{
+            margin:0;
+            padding:0;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:#ffffff;
+        }
+
+        .contact-container{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            padding:20px;
+            box-sizing:border-box;
+        }
+
+        .contact-card{
+            width:100%;
+            max-width:420px;
+            background:#f9f9f9;
+            border:1px solid #dcdcdc;
+            border-radius:10px;
+            padding:35px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+            text-align:center;
+        }
+
+        .contact-card h1{
+            margin-top:0;
+            margin-bottom:10px;
+            color:#003399;
+            font-size:28px;
+        }
+
+        .contact-card p{
+            color:#666;
+            margin-bottom:30px;
+            font-size:14px;
+            line-height:1.6;
+        }
+
+        .btn{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:100%;
+            padding:13px 20px;
+            margin:14px 0;
+            border-radius:6px;
+            font-weight:600;
+            font-size:15px;
+            text-decoration:none;
+            transition:all 0.25s ease;
+            color:#fff !important;
+            box-sizing:border-box;
+        }
+
+        .btn svg{
+            width:20px;
+            height:20px;
+            margin-right:10px;
+        }
+
+        .btn:hover{
+            transform:translateY(-2px);
+        }
+
+        /* GitHub Button */
+        .btn-github{
+            background:#24292e;
+        }
+
+        .btn-github:hover{
+            background:#111;
+        }
+
+        /* Website Button */
+        .btn-website{
+            background:linear-gradient(135deg, #005a9e 0%, #003366 100%);
+        }
+
+        .btn-website:hover{
+            background:linear-gradient(135deg, #004680 0%, #002244 100%);
+        }
+
+        .footer-text{
+            margin-top:20px;
+            font-size:12px;
+            color:#888;
+        }
+    </style>
+
+    <link rel="icon" type="image/png" href="img/Mahir.jpg"/>
+</head>
+
+<body>
+
+    <div class="contact-container">
+
+        <div class="contact-card">
+
+            <h1>Get in Touch</h1>
+
+            <p>
+                Feel free to explore my work, projects, and connect with me through the platforms below.
+            </p>
+
+            <!-- GitHub -->
+            <a href="https://github.com/dev-mahir-ahmed" target="_blank" class="btn btn-github">
+
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12
+                    0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577
+                    0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61
+                    C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729
+                    1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305
+                    3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93
+                    0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176
+                    0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405
+                    1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23
+                    3.285-1.23.645 1.653.24 2.873.12 3.176.765.84
+                    1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92
+                    .42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286
+                    0 .315.21.69.825.57C20.565 22.092 24 17.592
+                    24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+
+                GitHub Profile
+            </a>
+
+            <!-- Website -->
+            <a href="https://dev-mahir.vercel.app/" target="_blank" class="btn btn-website">
+
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+                    10-4.48 10-10S17.52 2 12 2zm6.93 6h-2.95
+                    c-.22-1.16-.56-2.25-1.02-3.22A8.03 8.03 0 0118.93 8zM12 4
+                    c.83 1.2 1.48 2.57 1.87 4h-3.74C10.52 6.57 11.17 5.2 12 4zM4.26 14
+                    a7.93 7.93 0 010-4h3.18a16.9 16.9 0 000 4H4.26zm.81 2h2.95
+                    c.22 1.16.56 2.25 1.02 3.22A8.03 8.03 0 015.07 16zM8.02 8H5.07
+                    a8.03 8.03 0 013.97-3.22C8.58 5.75 8.24 6.84 8.02 8zM12 20
+                    c-.83-1.2-1.48-2.57-1.87-4h3.74c-.39 1.43-1.04 2.8-1.87 4zm2.3-6H9.7
+                    a14.9 14.9 0 010-4h4.6a14.9 14.9 0 010 4zm.66 5.22
+                    c.46-.97.8-2.06 1.02-3.22h2.95a8.03 8.03 0 01-3.97 3.22zM16.56 14
+                    a16.9 16.9 0 000-4h3.18a7.93 7.93 0 010 4h-3.18z"/>
+                </svg>
+
+                Visit My Website
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

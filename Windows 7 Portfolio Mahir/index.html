@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Windows 7 Portfolio - Mahir Ahmed</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/window.css">
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="dns-prefetch" href="//res.cloudinary.com">
+    <link rel="preconnect" href="https://ui-avatars.com" crossorigin>
+    <link rel="dns-prefetch" href="//ui-avatars.com">
+    <link rel="prefetch" href="css/apps.css" as="style">
+    <link rel="prefetch" href="computer.html" as="document">
+    <link rel="prefetch" href="projects.html" as="document">
+    <link rel="prefetch" href="resume.html" as="document">
+    <link rel="prefetch" href="skills.html" as="document">
+    <link rel="prefetch" href="terminal.html" as="document">
+    <link rel="prefetch" href="calculator.html" as="document">
+    <link rel="prefetch" href="notepad.html" as="document">
+    <link rel="prefetch" href="paint.html" as="document">
+    <link rel="prefetch" href="taskmanager.html" as="document">
+    <link rel="prefetch" href="contact.html" as="document">
+    <link rel="prefetch" href="recycle.html" as="document">
+    <link rel="icon" type="image/png" href="img/Mahir.jpg"/>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="windows-11">
+        <div class="login-bg-orb orb-blue"></div>
+        <div class="login-bg-orb orb-violet"></div>
+        <div class="login-bg-orb orb-cyan"></div>
+        <div class="login-vignette"></div>
+
+        <div class="lock-time-block" aria-live="polite">
+            <div id="lock-time">12:00</div>
+            <div id="lock-date">Saturday, March 07</div>
+        </div>
+
+        <div class="login-center">
+            <div class="login-profile-w11">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w11-user-icon">
+                    <circle cx="12" cy="8" r="4.1"></circle>
+                    <path d="M6.5 19.2c0-3.18 2.75-5.2 5.5-5.2s5.5 2.02 5.5 5.2"></path>
+                </svg>
+            </div>
+            <div id="login-selected-user" class="login-name-w11">Administrator</div>
+            <button id="btn-login" class="login-btn-w11">Sign in</button>
+        </div>
+        
+        <div class="login-bottom-left">
+            <div class="w11-user-list-item active" data-user="Administrator" role="button" tabindex="0" aria-pressed="true">
+                <div class="w11-small-pic default-icon">
+                    <svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                </div>
+                <span>Administrator</span>
+            </div>
+            <div class="w11-user-list-item" data-user="Mahir Ahmed" role="button" tabindex="0" aria-pressed="false">
+                <div class="w11-small-pic default-icon">
+                    <svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                </div>
+                <span>Mahir Ahmed</span>
+            </div>
+        </div>
+
+        <div class="login-bottom-right" role="group" aria-label="Quick options">
+            <button type="button" class="lock-icon-btn" data-action="accessibility" aria-label="Toggle accessibility mode" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"></circle><path d="M5 9h14"></path><path d="M12 9v11"></path><path d="m8 20 4-6 4 6"></path></svg>
+            </button>
+            <button type="button" class="lock-icon-btn" data-action="theme" aria-label="Switch background style" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+            </button>
+            <button type="button" class="lock-icon-btn" data-action="restart" aria-label="Restart login screen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+            </button>
+        </div>
+        <div id="login-action-toast" class="login-action-toast" aria-live="polite"></div>
+    </div>
+
+    <!-- System Audio (Hidden) -->
+    <audio id="audio-startup" preload="auto" src="https://www.myinstants.com/media/sounds/windows-7-startup-sound.mp3"></audio>
+    <audio id="audio-shutdown" preload="auto" src="assets/audio/shutdown.mp3"></audio>
+    <audio id="audio-restart" preload="auto" src="https://www.myinstants.com/media/sounds/windows-restart.mp3"></audio>
+
+
+
+    <!-- Main Desktop -->
+    <div id="desktop-environment" style="display: none;">
+        <!-- Desktop Area -->
+        <div id="desktop-grid">
+            <!-- Desktop icons will be rendered here by JS -->
+        </div>
+
+        <!-- Window Container for all open apps -->
+        <div id="window-container"></div>
+
+        <!-- Start Menu -->
+        <div id="start-menu" class="aero-glass" style="display: none;">
+            <div class="start-menu-left">
+                <div id="start-programs-list">
+                    <!-- Programs injected by JS -->
+                </div>
+                <div class="start-search">
+                    <input type="text" id="start-search-input" placeholder="Search programs and files">
+                </div>
+            </div>
+            <div class="start-menu-right">
+                <div class="user-profile">
+                    <img src="img/Mahir.jpg" alt="Mahir" class="user-avatar">
+                    <span class="user-name">Mahir Ahmed</span>
+                </div>
+                <ul class="start-menu-links">
+                    <li data-app="about">About</li>
+                    <li data-app="taskmanager">Task Manager</li>
+                    <li data-app="projects">Projects</li>
+                    <li data-app="resume">Resume</li>
+                    <li data-app="terminal">Terminal</li>
+                    <li data-app="contact">Contact</li>
+                    <li data-app="github">GitHub</li>
+                    <li class="separator"></li>
+                    <li id="shutdown-btn">Shutdown</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div id="taskbar" class="aero-glass">
+            <div id="start-button">
+                <div class="windows-logo-small">
+                    <div class="win-sq red"></div><div class="win-sq green"></div>
+                    <div class="win-sq blue"></div><div class="win-sq yellow"></div>
+                </div>
+            </div>
+            <div id="taskbar-items">
+                <!-- Open windows will be listed here -->
+            </div>
+            <div id="system-tray">
+                <div id="clock">12:00 AM</div>
+                <div id="show-desktop"></div>
+            </div>
+        </div>
+
+        <!-- Context Menu -->
+        <div id="desktop-context-menu" class="context-menu aero-glass" style="display: none;">
+            <!-- Items injected by JS -->
+        </div>
+    </div>
+
+    <!-- Clock and Calendar Widget -->
+    <div id="clock-widget" class="aero-glass" style="display: none;">
+        <div class="clock-widget-container">
+            <div class="analog-clock">
+                <div class="clock-face">
+                    <div class="hand hour-hand" id="hour-hand"></div>
+                    <div class="hand min-hand" id="min-hand"></div>
+                    <div class="hand second-hand" id="sec-hand"></div>
+                    <div class="center-dot"></div>
+                </div>
+                <div class="digital-time" id="digital-clock-display">12:00:00 AM</div>
+            </div>
+            <div class="calendar-section">
+                <div class="calendar-header" id="calendar-header">March 2026</div>
+                <div class="calendar-grid">
+                    <div class="day-name">Su</div><div class="day-name">Mo</div><div class="day-name">Tu</div>
+                    <div class="day-name">We</div><div class="day-name">Th</div><div class="day-name">Fr</div><div class="day-name">Sa</div>
+                    <!-- Days injected by JS -->
+                </div>
+                <div class="current-date-footer" id="current-date-footer">Monday, March 02, 2026</div>
+            </div>
+        </div>
+    </div>
+    <!-- Shutdown Screen -->
+    <div id="shutdown-screen" style="display: none;">
+        <div class="shutdown-content">
+            <div class="spinner"></div>
+            <h1>Shutting down...</h1>
+        </div>
+    </div>
+
+    <!-- Audio files at end of body to prevent blocking load -->
+    <script src="js/system.js"></script>
+    <script src="js/window.js"></script>
+    <script src="js/desktop.js"></script>
+    <script src="js/taskbar.js"></script>
+</body>
+</html>
