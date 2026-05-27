@@ -273,186 +273,200 @@
 
     </div>
 
-    <script>
+<script>
 
-        const projects = [
+    const projects = [
 
-            {
-                name: "Nakla Sherpur Blood Bank",
-                lang: "Html • CSS • Tailwind CSS • Javascript • Firebase",
-                desc: "Emergency blood donor platform helping people quickly find nearby blood donors.",
-                url: "https://nakla-sherpur-blood-bank.vercel.app/"
-            },
+        {
+            name: "Nakla Sherpur Blood Bank",
+            lang: "Html • CSS • Tailwind CSS • Javascript • Firebase",
+            desc: "Emergency blood donor platform helping people quickly find nearby blood donors.",
+            url: "https://nakla-sherpur-blood-bank.vercel.app/",
+            buttonText: "Visit Project"
+        },
 
-            {
-                name: "Polytechnic AI",
-                lang: "Html • CSS • Tailwind CSS • Javascript • AI Integration • Firebase",
-                desc: "AI-powered learning assistant built specifically for polytechnic students.",
-                url: "https://polytechnic-ai.vercel.app/"
-            },
+        {
+            name: "Polytechnic AI",
+            lang: "Html • CSS • Tailwind CSS • Javascript • AI Integration • Firebase",
+            desc: "AI-powered learning assistant built specifically for polytechnic students.",
+            url: "https://polytechnic-ai.vercel.app/",
+            buttonText: "Visit Project"
+        },
 
-            {
-                name: "Polytechnic Cover Page Generator",
-                lang: "Html • CSS • Javascript",
-                desc: "Online tool for generating printable assignment and job cover pages instantly.",
-                url: "https://cover-page-generator-gold.vercel.app/"
-            },
+        {
+            name: "Polytechnic Cover Page Generator",
+            lang: "Html • CSS • Javascript",
+            desc: "Online tool for generating printable assignment and job cover pages instantly.",
+            url: "https://cover-page-generator-gold.vercel.app/",
+            buttonText: "Visit Project"
+        },
 
-            {
-                name: "Bajar List App",
-                lang: "React • Vite • Capacitor • Tailwind CSS • Local Storage • Android Studio",
-                desc: "Smart shopping list application with categorized grocery management.",
-                url: "https://bajar-list-app.vercel.app/"
-            },
+        {
+            name: "Bajar List App",
+            lang: "React • Vite • Capacitor • Tailwind CSS • Local Storage • Android Studio",
+            desc: "Smart shopping list application with categorized grocery management.",
+            url: "https://bajar-list-app.vercel.app/",
+            buttonText: "Visit Project"
+        },
 
-            {
-                name: "Amar Hisab",
-                lang: "React • Vite • Capacitor • Tailwind CSS • Local Storage • Android Studio",
-                desc: "Offline-first expense tracker application for daily finance management.",
-                url: "https://amar-hisab-app.vercel.app/"
-            },
+        {
+            name: "Amar Hisab",
+            lang: "React • Vite • Capacitor • Tailwind CSS • Local Storage • Android Studio",
+            desc: "Offline-first expense tracker application for daily finance management.",
+            url: "https://play.google.com/store/apps/details?id=com.mahirhisab.app",
+            buttonText: "View on Play Store"
+        },
 
-            {
-                name: "Mahir Resize",
-                lang: "Html • CSS • Javascript",
-                desc: "Privacy-focused image resize, compress, crop and convert tool.",
-                url: "https://mahir-resize.vercel.app/"
-            },
+        {
+            name: "Mahir Resize",
+            lang: "Html • CSS • Javascript",
+            desc: "Privacy-focused image resize, compress, crop and convert tool.",
+            url: "https://mahir-resize.vercel.app/",
+            buttonText: "Visit Project"
+        },
 
-            {
-                name: "MN Media",
-                lang: "Html • CSS • Javascript",
-                desc: "Modern digital agency website focused on development and design services.",
-                url: "https://mn-media.vercel.app/"
-            }
+        {
+            name: "MN Media",
+            lang: "Html • CSS • Javascript",
+            desc: "Modern digital agency website focused on development and design services.",
+            url: "https://mn-media.vercel.app/",
+            buttonText: "Visit Project"
+        }
 
-        ];
+    ];
 
-        const container = document.getElementById("projects-container");
+    const container = document.getElementById("projects-container");
 
-        projects.forEach((proj) => {
+    projects.forEach((proj) => {
 
-            const card = document.createElement("div");
+        const card = document.createElement("div");
 
-            card.className = "project-card";
+        card.className = "project-card";
 
-            card.innerHTML = `
-                <div class="project-title">${proj.name}</div>
+        card.innerHTML = `
+            <div class="project-title">${proj.name}</div>
 
-                <div class="project-lang">
-                    ${proj.lang}
-                </div>
+            <div class="project-lang">
+                ${proj.lang}
+            </div>
 
-                <div class="project-desc">
-                    ${proj.desc}
-                </div>
+            <div class="project-desc">
+                ${proj.desc}
+            </div>
 
-                <div class="project-actions">
+            <div class="project-actions">
 
-                    <a href="#"
-                       class="project-link private-btn">
+                <a href="#"
+                   class="project-link private-btn">
 
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2">
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
 
-                            <rect x="3"
-                                  y="11"
-                                  width="18"
-                                  height="11"
-                                  rx="2"
-                                  ry="2"></rect>
+                        <rect x="3"
+                              y="11"
+                              width="18"
+                              height="11"
+                              rx="2"
+                              ry="2"></rect>
 
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
 
-                        </svg>
+                    </svg>
 
-                        Private Repository
+                    Private Repository
 
-                    </a>
+                </a>
 
-                    <a href="${proj.url}"
-                       target="_blank"
-                       class="project-link">
+                <a href="${proj.url}"
+                   target="_blank"
+                   class="project-link">
 
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2">
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
 
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
 
-                            <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="15 3 21 3 21 9"></polyline>
 
-                            <line x1="10"
-                                  y1="14"
-                                  x2="21"
-                                  y2="3"></line>
+                        <line x1="10"
+                              y1="14"
+                              x2="21"
+                              y2="3"></line>
 
-                        </svg>
+                    </svg>
 
-                        Visit Website
+                    ${proj.buttonText}
 
-                    </a>
+                </a>
 
-                </div>
-            `;
+            </div>
+        `;
 
-            const privateBtn = card.querySelector(".private-btn");
+        const privateBtn = card.querySelector(".private-btn");
 
-            privateBtn.addEventListener("click", function(e) {
+        privateBtn.addEventListener("click", function(e) {
 
-                e.preventDefault();
+            e.preventDefault();
 
-                openJoke();
-
-            });
-
-            container.appendChild(card);
+            openJoke();
 
         });
 
-        const messages = [
+        container.appendChild(card);
 
-            "ACCESS DENIED.\n\nThis repository is private.",
+    });
 
-            "SECURITY ALERT.\n\nYou do not have permission to access this repository.",
+    const messages = [
 
-            "PRIVATE SOURCE CODE DETECTED.\n\nAccess blocked successfully.",
+        "ACCESS DENIED.\n\nThis repository is private.",
 
-            "Nice try.\n\nBut these repositories are locked."
+        "SECURITY ALERT.\n\nYou do not have permission to access this repository.",
 
-        ];
+        "PRIVATE SOURCE CODE DETECTED.\n\nAccess blocked successfully.",
 
-        function openJoke() {
+        "Nice try.\n\nBut these repositories are locked."
 
-            const randomMessage =
-                messages[Math.floor(Math.random() * messages.length)];
+    ];
 
-            document.getElementById("joke-msg").innerText =
-                randomMessage;
+    function openJoke() {
 
-            document.getElementById("joke-modal").style.display =
-                "flex";
+        const randomMessage =
+            messages[Math.floor(Math.random() * messages.length)];
+
+        document.getElementById("joke-msg").innerText =
+            randomMessage;
+
+        document.getElementById("joke-modal").style.display =
+            "flex";
+    }
+
+    function closeJoke() {
+
+        document.getElementById("joke-modal").style.display =
+            "none";
+    }
+
+    // ── Source Code Inspect Block js code ────────
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    document.onkeydown = function(e) {
+
+        if (
+            e.keyCode == 123 ||
+            (e.ctrlKey && e.key == 'u') ||
+            (e.ctrlKey && e.shiftKey && e.key == 'I')
+        ) {
+            return false;
         }
 
-        function closeJoke() {
+    }
 
-            document.getElementById("joke-modal").style.display =
-                "none";
-        }
-
-        // ── Source Code Inspect Block js code ────────
-
-document.addEventListener('contextmenu', event => event.preventDefault());
-            document.onkeydown = function(e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.key == 'u') || (e.ctrlKey && e.shiftKey && e.key == 'I')) {
-                return false;
-              }
-            }
-            
-    </script>
+</script>
 
 </body>
 </html>
